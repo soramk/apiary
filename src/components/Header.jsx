@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Database, Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText, History } from 'lucide-react';
 import { exportToJson, exportToCsv, exportToMarkdown, importFromJson } from '../services/database';
+import apiaryLogo from '../assets/apiary_logo.png';
 
 export default function Header({ onImportComplete, onOpenSettings, onOpenHistory }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -80,10 +81,9 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                         {/* Logo */}
                         <div className="flex items-center gap-2">
                             <img
-                                src="/apiary_logo.png"
+                                src={apiaryLogo}
                                 alt="Apiary"
                                 className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
-                                loading="eager"
                             />
                         </div>
 
