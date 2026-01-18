@@ -170,7 +170,7 @@ export async function searchApis(keyword, saveHistory = true) {
                     ],
                     generationConfig: {
                         temperature: 0.7,
-                        maxOutputTokens: 4096,
+                        maxOutputTokens: 65536,
                     }
                 }),
                 signal: controller.signal
@@ -216,20 +216,7 @@ export async function searchApis(keyword, saveHistory = true) {
             throw new Error('AIからの応答が空でした');
         }
 
-        // JSONをパース
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            historyEntry.processingTime = processingTime;
-            historyEntry.tokenUsage = tokenUsage;
-            historyEntry.response = text;
-            historyEntry.error = 'AIの応答からJSONを抽出できませんでした';
-            if (saveHistory) {
-                await saveSearchHistory(historyEntry);
-            }
-            throw new Error('AIの応答からJSONを抽出できませんでした');
-        }
-
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = parseAiJson(text);
         const apis = parsed.apis || [];
 
         // 履歴エントリを完成
@@ -359,7 +346,7 @@ URL: "${url}"
                     ],
                     generationConfig: {
                         temperature: 0.5,
-                        maxOutputTokens: 4096,
+                        maxOutputTokens: 65536,
                     }
                 }),
                 signal: controller.signal
@@ -401,20 +388,7 @@ URL: "${url}"
             throw new Error('AIからの応答が空でした');
         }
 
-        // JSONをパース
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            historyEntry.processingTime = processingTime;
-            historyEntry.tokenUsage = tokenUsage;
-            historyEntry.response = text;
-            historyEntry.error = 'AIの応答からJSONを抽出できませんでした';
-            if (saveToHistory) {
-                await saveSearchHistory(historyEntry);
-            }
-            throw new Error('AIの応答からJSONを抽出できませんでした');
-        }
-
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = parseAiJson(text);
 
         // エラーレスポンスのチェック
         if (parsed.error) {
@@ -567,7 +541,7 @@ ${authInstruction}
                     ],
                     generationConfig: {
                         temperature: 0.3,
-                        maxOutputTokens: 40960,
+                        maxOutputTokens: 65536,
                     }
                 }),
                 signal: controller.signal
@@ -696,7 +670,7 @@ JSONのみを返してください。`;
                     ],
                     generationConfig: {
                         temperature: 0.3,
-                        maxOutputTokens: 1024,
+                        maxOutputTokens: 65536,
                     }
                 }),
                 signal: controller.signal
@@ -732,17 +706,7 @@ JSONのみを返してください。`;
             throw new Error('AIからの応答が空でした');
         }
 
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            historyEntry.processingTime = processingTime;
-            historyEntry.tokenUsage = tokenUsage;
-            historyEntry.response = text;
-            historyEntry.error = '応答からJSONを抽出できませんでした';
-            await saveSearchHistory(historyEntry);
-            throw new Error('応答からJSONを抽出できませんでした');
-        }
-
-        const result = JSON.parse(jsonMatch[0]);
+        const result = parseAiJson(text);
         historyEntry.response = text;
         historyEntry.tokenUsage = tokenUsage;
         historyEntry.processingTime = processingTime;
@@ -822,7 +786,9 @@ ${JSON.stringify(apiInfo, null, 2)}
 - URLが正しいかどうかを確認してください
 - 料金や認証方式が最新かどうかを確認してください
 - 情報が確認できない場合は isVerified を false にしてください
-- JSONのみを返し、マークダウンの装飾は不要です`;
+- JSONのみを返し、マークダウンの装飾は不要です
+- 文字列内のダブルクォートは必ずバックスラッシュでエスケープしてください（例: \" ）
+- 文字列内で改行が必要な場合は \n を使用し、実際の改行は含めないでください`;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
@@ -859,7 +825,7 @@ ${JSON.stringify(apiInfo, null, 2)}
                     ],
                     generationConfig: {
                         temperature: 0.3,
-                        maxOutputTokens: 4096,
+                        maxOutputTokens: 65536,
                     }
                 }),
                 signal: controller.signal
@@ -887,12 +853,7 @@ ${JSON.stringify(apiInfo, null, 2)}
             throw new Error('AIからの応答が空でした');
         }
 
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('AIの応答からJSONを抽出できませんでした');
-        }
-
-        const result = JSON.parse(jsonMatch[0]);
+        const result = parseAiJson(text);
 
         // 履歴エントリを完成
         historyEntry.response = text;
@@ -917,6 +878,52 @@ ${JSON.stringify(apiInfo, null, 2)}
         }
 
         throw error;
+    }
+}
+
+/**
+ * AIの応答からJSONを抽出してパースする
+ * @param {string} text 
+ * @returns {Object}
+ */
+function parseAiJson(text) {
+    if (!text) {
+        throw new Error('AIからの応答が空でした');
+    }
+
+    try {
+        // 1. コードブロックを探す
+        const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        let jsonStr = codeBlockMatch ? codeBlockMatch[1] : text;
+
+        // 2. 波括弧の範囲を特定（コードブロックがない場合や、コードブロックの外にゴミがある場合）
+        if (!codeBlockMatch) {
+            const firstBrace = jsonStr.indexOf('{');
+            const lastBrace = jsonStr.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+            }
+        }
+
+        // 3. 一般的な修正
+        jsonStr = jsonStr.trim();
+
+        // 末尾のカンマを削除 (], や },)
+        jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
+
+        return JSON.parse(jsonStr);
+    } catch (e) {
+        console.error('JSON Parse Error. Original text:', text);
+
+        // パース失敗時の最後の手段：制御文字などを取り除いてみる
+        try {
+            const cleaned = text.match(/\{[\s\S]*\}/)?.[0]
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // 制御文字の削除
+                .replace(/,\s*([\]}])/g, '$1');
+            return JSON.parse(cleaned);
+        } catch (e2) {
+            throw new Error('AIの応答をJSONとしてパースできませんでした。形式が正しくない可能性があります。');
+        }
     }
 }
 
