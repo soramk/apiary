@@ -499,6 +499,10 @@ export async function generateCode(apiInfo, language) {
         curl: 'cURL コマンド'
     };
 
+    const authInstruction = apiInfo.authType === 'None'
+        ? '2. 認証は不要なため、APIキー等の設定は含めないでください'
+        : '2. 認証の設定（プレースホルダーとして YOUR_API_KEY を使用）';
+
     const prompt = `以下のAPI情報を元に、${languageTemplates[language] || language}で実行可能なサンプルコードを生成してください。
 
 API情報:
@@ -509,7 +513,7 @@ API情報:
 
 以下を含めてください:
 1. 必要なインポート/モジュール
-2. 認証の設定（プレースホルダーとして YOUR_API_KEY を使用）
+${authInstruction}
 3. リクエストの実行
 4. レスポンスの処理
 5. エラーハンドリング
