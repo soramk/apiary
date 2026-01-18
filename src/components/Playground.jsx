@@ -9,6 +9,7 @@ export default function Playground({ api }) {
     const [response, setResponse] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [useProxy, setUseProxy] = useState(false);
 
     const handleExecute = async () => {
         setIsLoading(true);
@@ -18,9 +19,14 @@ export default function Playground({ api }) {
         try {
             const parsedHeaders = JSON.parse(headers);
             const baseUrl = api.url.replace(/\/$/, '');
-            const fullUrl = endpoint.startsWith('http')
+            let fullUrl = endpoint.startsWith('http')
                 ? endpoint
                 : `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+
+            // プロキシを使用する場合
+            if (useProxy) {
+                fullUrl = `https://corsproxy.io/?${encodeURIComponent(fullUrl)}`;
+            }
 
             const options = {
                 method,
@@ -133,24 +139,43 @@ export default function Playground({ api }) {
                     </div>
                 )}
 
-                {/* Execute Button */}
-                <button
-                    onClick={handleExecute}
-                    disabled={isLoading || !endpoint}
-                    className="btn-primary px-6 py-3 rounded-xl text-white font-medium flex items-center gap-2 disabled:opacity-50"
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            実行中...
-                        </>
-                    ) : (
-                        <>
-                            <Send className="w-5 h-5" />
-                            リクエストを実行
-                        </>
-                    )}
-                </button>
+                {/* Execute Button & Proxy Toggle */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <button
+                        onClick={handleExecute}
+                        disabled={isLoading || !endpoint}
+                        className="btn-primary px-6 py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 min-w-[160px]"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                実行中...
+                            </>
+                        ) : (
+                            <>
+                                <Send className="w-5 h-5" />
+                                リクエストを実行
+                            </>
+                        )}
+                    </button>
+
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="relative">
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={useProxy}
+                                onChange={(e) => setUseProxy(e.target.checked)}
+                            />
+                            <div className={`w-10 h-6 rounded-full transition-colors ${useProxy ? 'bg-indigo-600' : 'bg-slate-300'}`}></div>
+                            <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${useProxy ? 'translate-x-4' : ''}`}></div>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium text-slate-700">プロキシを経由する (CORS回避)</span>
+                            <span className="text-xs text-slate-500">ブラウザ制限でエラーが出る場合に有効にしてください</span>
+                        </div>
+                    </label>
+                </div>
             </div>
 
             {/* Response */}
@@ -159,12 +184,23 @@ export default function Playground({ api }) {
                     <h4 className="text-sm font-medium text-slate-700">レスポンス</h4>
 
                     {error ? (
-                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
-                            <div className="flex items-center gap-2 text-rose-400">
+                        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                            <div className="flex items-center gap-2 text-rose-600">
                                 <XCircle className="w-5 h-5" />
                                 <span className="font-medium">エラー</span>
                             </div>
-                            <p className="mt-2 text-rose-300 text-sm">{error}</p>
+                            <p className="mt-2 text-rose-800 text-sm leading-relaxed">{error}</p>
+                            {!useProxy && error.includes('CORS') && (
+                                <button
+                                    onClick={() => {
+                                        setUseProxy(true);
+                                        setError(null);
+                                    }}
+                                    className="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium underline underline-offset-4"
+                                >
+                                    プロキシを有効にして再試行する
+                                </button>
+                            )}
                         </div>
                     ) : response && (
                         <div className="code-block overflow-hidden">

@@ -15,7 +15,10 @@ import {
     Heart,
     Tag,
     Plus,
-    X
+    X,
+    BookOpen,
+    Target,
+    XCircle
 } from 'lucide-react';
 import { checkApiStatus } from '../services/gemini';
 import { saveApi } from '../services/database';
