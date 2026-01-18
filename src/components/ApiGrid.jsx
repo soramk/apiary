@@ -44,7 +44,7 @@ export default function ApiGrid({ apis, onSelect, onDelete, onToggleFavorite, is
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <h2 className="text-xl font-bold text-slate-800">集めた蜜 (API)</h2>
-                    <span className="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-sm font-medium">
+                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-medium">
                         {apis.length}件
                     </span>
                 </div>

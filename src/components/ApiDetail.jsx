@@ -204,7 +204,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                             {/* AI再検証ボタン */}
                             <button
                                 onClick={() => setShowVerifyModal(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-violet-300 hover:text-white bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-colors"
                                 title="AIで情報を再検証"
                             >
                                 <ShieldCheck className="w-4 h-4" />
@@ -244,41 +244,41 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
             {statusResult && (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                     {statusResult.error ? (
-                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
-                            <p className="text-rose-300 text-sm">{statusResult.error}</p>
+                        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                            <p className="text-rose-800 text-sm">{statusResult.error}</p>
                         </div>
                     ) : (
                         <div className={`p-4 rounded-xl border ${statusResult.status === 'active'
-                            ? 'bg-emerald-500/10 border-emerald-500/30'
+                            ? 'bg-emerald-50 border-emerald-200'
                             : statusResult.status === 'deprecated'
-                                ? 'bg-amber-500/10 border-amber-500/30'
-                                : 'bg-rose-500/10 border-rose-500/30'
+                                ? 'bg-amber-50 border-amber-200'
+                                : 'bg-rose-50 border-rose-200'
                             }`}>
                             <div className="flex items-center gap-2 mb-2">
                                 {statusResult.status === 'active' && (
                                     <>
-                                        <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                        <span className="font-medium text-emerald-300">このAPIは現在アクティブです</span>
+                                        <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                        <span className="font-medium text-emerald-800">このAPIは現在アクティブです</span>
                                     </>
                                 )}
                                 {statusResult.status === 'deprecated' && (
                                     <>
-                                        <AlertTriangle className="w-5 h-5 text-amber-400" />
-                                        <span className="font-medium text-amber-300">このAPIは非推奨になっています</span>
+                                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                                        <span className="font-medium text-amber-800">このAPIは非推奨になっています</span>
                                     </>
                                 )}
                                 {statusResult.status === 'eol' && (
                                     <>
-                                        <XCircle className="w-5 h-5 text-rose-400" />
-                                        <span className="font-medium text-rose-300">このAPIはサービス終了しています</span>
+                                        <XCircle className="w-5 h-5 text-rose-600" />
+                                        <span className="font-medium text-rose-800">このAPIはサービス終了しています</span>
                                     </>
                                 )}
                             </div>
                             {statusResult.changes && (
-                                <p className="text-sm text-slate-300 ml-7">{statusResult.changes}</p>
+                                <p className="text-sm text-slate-700 ml-7">{statusResult.changes}</p>
                             )}
                             {statusResult.notes && (
-                                <p className="text-sm text-slate-400 ml-7 mt-1">{statusResult.notes}</p>
+                                <p className="text-sm text-slate-600 ml-7 mt-1">{statusResult.notes}</p>
                             )}
                         </div>
                     )}
