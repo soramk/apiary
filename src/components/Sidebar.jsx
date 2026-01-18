@@ -10,7 +10,9 @@ import {
     FolderOpen,
     Folder,
     Check,
-    Filter
+    Filter,
+    Heart,
+    Star
 } from 'lucide-react';
 
 /**
@@ -20,13 +22,15 @@ const GROUP_TYPES = {
     CATEGORY: 'category',
     PROVIDER: 'provider',
     KEYWORD: 'searchKeyword',
-    STATUS: 'status'
+    STATUS: 'status',
+    TAGS: 'tags'
 };
 
 const GROUP_LABELS = {
     [GROUP_TYPES.CATEGORY]: { label: 'カテゴリ', icon: Tag },
-    [GROUP_TYPES.PROVIDER]: { label: 'プロバイダー', icon: Building2 },
-    [GROUP_TYPES.KEYWORD]: { label: '検索キーワード', icon: Search },
+    [GROUP_TYPES.TAGS]: { label: '個人タグ', icon: Star },
+    [GROUP_TYPES.PROVIDER]: { label: '提供元', icon: Building2 },
+    [GROUP_TYPES.KEYWORD]: { label: '検索履歴', icon: Search },
     [GROUP_TYPES.STATUS]: { label: 'ステータス', icon: Layers }
 };
 
@@ -43,11 +47,25 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
         const groups = {};
 
         apis.forEach((api) => {
-            const key = api[groupBy] || '未分類';
-            if (!groups[key]) {
-                groups[key] = [];
+            if (groupBy === GROUP_TYPES.TAGS) {
+                const tags = api.tags || [];
+                if (tags.length === 0) {
+                    const key = 'タグなし';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(api);
+                } else {
+                    tags.forEach(tag => {
+                        if (!groups[tag]) groups[tag] = [];
+                        groups[tag].push(api);
+                    });
+                }
+            } else {
+                const key = api[groupBy] || '未分類';
+                if (!groups[key]) {
+                    groups[key] = [];
+                }
+                groups[key].push(api);
             }
-            groups[key].push(api);
         });
 
         // ソート（アイテム数の多い順）
@@ -201,6 +219,31 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                             className="lg:hidden p-1.5 rounded-lg hover:bg-pink-50 text-slate-400 hover:text-slate-600 transition-colors"
                         >
                             <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    {/* Quick Filters */}
+                    <div className="flex gap-2 mb-4">
+                        <button
+                            onClick={() => {
+                                const newFilters = { ...selectedFilters };
+                                if (newFilters.onlyFavorites) {
+                                    delete newFilters.onlyFavorites;
+                                } else {
+                                    newFilters.onlyFavorites = true;
+                                }
+                                onFilterChange(newFilters);
+                            }}
+                            className={`
+                                flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all
+                                ${selectedFilters.onlyFavorites
+                                    ? 'bg-rose-500 text-white shadow-md shadow-rose-200 border border-rose-500'
+                                    : 'bg-white text-slate-600 hover:bg-rose-50 hover:text-rose-500 border border-slate-200'
+                                }
+                            `}
+                        >
+                            <Heart className={`w-4 h-4 ${selectedFilters.onlyFavorites ? 'fill-current' : ''}`} />
+                            お気に入り
                         </button>
                     </div>
 

@@ -9,12 +9,13 @@ import {
     Loader2,
     CheckCircle,
     AlertTriangle,
-    XCircle,
-    BookOpen,
-    Target,
     Code2,
     Edit3,
-    ShieldCheck
+    ShieldCheck,
+    Heart,
+    Tag,
+    Plus,
+    X
 } from 'lucide-react';
 import { checkApiStatus } from '../services/gemini';
 import { saveApi } from '../services/database';
@@ -29,6 +30,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
     const [statusResult, setStatusResult] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
+    const [newTag, setNewTag] = useState('');
 
     const tabs = [
         { id: 'overview', label: 'Overview', icon: BookOpen },
@@ -93,6 +95,47 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
         onUpdate?.(updatedApi);
     };
 
+    // お気に入りトグル
+    const handleToggleFavorite = async () => {
+        const updatedApi = {
+            ...api,
+            isFavorite: !api.isFavorite
+        };
+        await saveApi(updatedApi);
+        onUpdate?.(updatedApi);
+    };
+
+    // タグ追加
+    const handleAddTag = async (e) => {
+        e.preventDefault();
+        const tag = newTag.trim();
+        if (!tag) return;
+
+        const tags = api.tags || [];
+        if (tags.includes(tag)) {
+            setNewTag('');
+            return;
+        }
+
+        const updatedApi = {
+            ...api,
+            tags: [...tags, tag]
+        };
+        await saveApi(updatedApi);
+        onUpdate?.(updatedApi);
+        setNewTag('');
+    };
+
+    // タグ削除
+    const handleRemoveTag = async (tagToRemove) => {
+        const updatedApi = {
+            ...api,
+            tags: (api.tags || []).filter(t => t !== tagToRemove)
+        };
+        await saveApi(updatedApi);
+        onUpdate?.(updatedApi);
+    };
+
     // 検証結果適用ハンドラー
     const handleApplyCorrections = async (correctedApi) => {
         await saveApi(correctedApi);
@@ -113,20 +156,34 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                     </button>
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <h1 className="text-2xl font-bold text-slate-800">{api.name}</h1>
-                                <span className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
-                                    {api.category}
-                                </span>
-                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium border ${statusConfig.className}`}>
-                                    <StatusIcon className="w-4 h-4" />
-                                    <span>{statusConfig.label}</span>
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-3">
+                                    <h1 className="text-2xl font-bold text-slate-800">{api.name}</h1>
+                                    <button
+                                        onClick={handleToggleFavorite}
+                                        className={`p-2 rounded-lg transition-all ${api.isFavorite
+                                            ? 'text-rose-500 bg-rose-50'
+                                            : 'text-slate-400 hover:text-rose-500 hover:bg-rose-50'
+                                            }`}
+                                        title={api.isFavorite ? 'お気に入り解除' : 'お気に入り追加'}
+                                    >
+                                        <Heart className={`w-6 h-6 ${api.isFavorite ? 'fill-current' : ''}`} />
+                                    </button>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-slate-600">
-                                <Building2 className="w-4 h-4" />
-                                <span>{api.provider}</span>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
+                                        {api.category}
+                                    </span>
+                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium border ${statusConfig.className}`}>
+                                        <StatusIcon className="w-4 h-4" />
+                                        <span>{statusConfig.label}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-slate-600 text-sm ml-2">
+                                        <Building2 className="w-4 h-4" />
+                                        <span>{api.provider}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -370,6 +427,51 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                         </span>
                                     </div>
                                 )}
+
+                                {/* Tags Management */}
+                                <div className="pt-6 border-t border-slate-200">
+                                    <div className="flex items-center gap-2 text-slate-500 mb-3">
+                                        <Tag className="w-4 h-4" />
+                                        <span className="text-sm font-semibold">タグ管理</span>
+                                    </div>
+
+                                    <form onSubmit={handleAddTag} className="flex gap-2 mb-4">
+                                        <input
+                                            type="text"
+                                            value={newTag}
+                                            onChange={(e) => setNewTag(e.target.value)}
+                                            placeholder="タグを追加..."
+                                            className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </form>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {(api.tags || []).length === 0 ? (
+                                            <p className="text-xs text-slate-400 italic">タグはまだありません</p>
+                                        ) : (
+                                            api.tags.map((tag, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-xs text-indigo-700 group/tag"
+                                                >
+                                                    <span>{tag}</span>
+                                                    <button
+                                                        onClick={() => handleRemoveTag(tag)}
+                                                        className="hover:text-rose-500 transition-colors"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

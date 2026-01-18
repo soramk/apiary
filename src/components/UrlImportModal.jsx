@@ -72,13 +72,13 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
     const getConfidenceColor = (confidence) => {
         switch (confidence) {
             case 'high':
-                return 'text-emerald-400 bg-emerald-500/20';
+                return 'text-emerald-700 bg-emerald-50 border border-emerald-200';
             case 'medium':
-                return 'text-amber-400 bg-amber-500/20';
+                return 'text-amber-700 bg-amber-50 border border-amber-200';
             case 'low':
-                return 'text-rose-400 bg-rose-500/20';
+                return 'text-rose-700 bg-rose-50 border border-rose-200';
             default:
-                return 'text-slate-400 bg-slate-500/20';
+                return 'text-slate-600 bg-slate-50 border border-slate-200';
         }
     };
 
@@ -177,11 +177,11 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
 
                         {/* エラー表示 */}
                         {error && (
-                            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3">
-                                <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 flex-shrink-0" />
+                            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-rose-300 font-medium">エラー</p>
-                                    <p className="text-sm text-rose-200/70 mt-1">{error}</p>
+                                    <p className="text-rose-800 font-medium">エラー</p>
+                                    <p className="text-sm text-rose-700 mt-1">{error}</p>
                                 </div>
                             </div>
                         )}
@@ -190,8 +190,8 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                         {result && (
                             <div className="space-y-4 animate-fade-in">
                                 <div className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                    <span className="text-emerald-300 font-medium">API情報を取得しました</span>
+                                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                    <span className="text-emerald-700 font-medium">API情報を取得しました</span>
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${getConfidenceColor(result.confidence)}`}>
                                         {getConfidenceLabel(result.confidence)}
                                     </span>
@@ -235,8 +235,8 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                     )}
 
                                     {result.notes && (
-                                        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                                            <p className="text-xs text-amber-300">{result.notes}</p>
+                                        <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                                            <p className="text-xs text-amber-700">{result.notes}</p>
                                         </div>
                                     )}
                                 </div>

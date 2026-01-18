@@ -50,13 +50,27 @@ export default function App() {
 
     // Filter APIs based on selected filters (複数選択対応)
     const filteredApis = useMemo(() => {
-        if (Object.keys(filters).length === 0) {
-            return apis;
+        let result = apis;
+
+        // お気に入りのみフィルター
+        if (filters.onlyFavorites) {
+            result = result.filter(api => api.isFavorite);
         }
 
-        return apis.filter((api) => {
-            // すべてのフィルタータイプに対してチェック
+        // その他のフィルター（カテゴリ、プロバイダーなど）
+        result = result.filter((api) => {
             return Object.entries(filters).every(([key, value]) => {
+                if (key === 'onlyFavorites') return true;
+
+                // タグフィルターの特別処理
+                if (key === 'tags') {
+                    if (!value || value.length === 0) return true;
+                    // APIが持っているタグのいずれかが、フィルターで選択されたタグに含まれているか（OR条件）
+                    // または、選択されたすべてのタグをAPIが持っているか（AND条件）
+                    // ここでは使いやすさを考慮して、いずれかにマッチすればOK（OR条件）とします
+                    return (api.tags || []).some(tag => value.includes(tag));
+                }
+
                 const apiValue = api[key] || '未分類';
 
                 // 値が配列の場合（複数選択）
@@ -69,6 +83,8 @@ export default function App() {
                 return apiValue === value;
             });
         });
+
+        return result;
     }, [apis, filters]);
 
     // Search handler
@@ -120,7 +136,8 @@ export default function App() {
     }, [deleteTarget]);
 
     // API update handler
-    const handleApiUpdate = useCallback((updatedApi) => {
+    const handleApiUpdate = useCallback(async (updatedApi) => {
+        await saveApi(updatedApi);
         setApis((prev) => prev.map((api) =>
             api.id === updatedApi.id ? updatedApi : api
         ));
@@ -128,6 +145,19 @@ export default function App() {
             setSelectedApi(updatedApi);
         }
     }, [selectedApi]);
+
+    // Toggle Favorite handler
+    const handleToggleFavorite = useCallback(async (apiId) => {
+        const api = apis.find(a => a.id === apiId);
+        if (!api) return;
+
+        const updatedApi = {
+            ...api,
+            isFavorite: !api.isFavorite
+        };
+
+        await handleApiUpdate(updatedApi);
+    }, [apis, handleApiUpdate]);
 
     // Reload data after import
     const handleImportComplete = useCallback(async () => {
@@ -239,6 +269,7 @@ export default function App() {
                     apis={filteredApis}
                     onSelect={setSelectedApi}
                     onDelete={setDeleteTarget}
+                    onToggleFavorite={handleToggleFavorite}
                     isLoading={isLoading || isSearching}
                 />
             </div>

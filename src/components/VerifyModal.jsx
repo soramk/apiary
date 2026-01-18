@@ -55,33 +55,33 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
             case 'high':
                 return {
                     icon: ShieldCheck,
-                    color: 'text-emerald-400',
-                    bgColor: 'bg-emerald-500/10',
-                    borderColor: 'border-emerald-500/30',
+                    color: 'text-emerald-700',
+                    bgColor: 'bg-emerald-50',
+                    borderColor: 'border-emerald-200',
                     label: '高信頼度'
                 };
             case 'medium':
                 return {
                     icon: ShieldAlert,
-                    color: 'text-amber-400',
-                    bgColor: 'bg-amber-500/10',
-                    borderColor: 'border-amber-500/30',
+                    color: 'text-amber-700',
+                    bgColor: 'bg-amber-50',
+                    borderColor: 'border-amber-200',
                     label: '中信頼度'
                 };
             case 'low':
                 return {
                     icon: ShieldX,
-                    color: 'text-rose-400',
-                    bgColor: 'bg-rose-500/10',
-                    borderColor: 'border-rose-500/30',
+                    color: 'text-rose-700',
+                    bgColor: 'bg-rose-50',
+                    borderColor: 'border-rose-200',
                     label: '低信頼度'
                 };
             default:
                 return {
                     icon: ShieldAlert,
-                    color: 'text-slate-400',
-                    bgColor: 'bg-slate-500/10',
-                    borderColor: 'border-slate-500/30',
+                    color: 'text-slate-600',
+                    bgColor: 'bg-slate-50',
+                    borderColor: 'border-slate-200',
                     label: '不明'
                 };
         }
@@ -168,15 +168,15 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
 
                         {/* エラー */}
                         {error && (
-                            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
+                            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
                                 <div className="flex items-start gap-3">
-                                    <AlertTriangle className="w-5 h-5 text-rose-400 mt-0.5 flex-shrink-0" />
+                                    <AlertTriangle className="w-5 h-5 text-rose-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-rose-300 font-medium">検証に失敗しました</p>
-                                        <p className="text-sm text-rose-200/70 mt-1">{error}</p>
+                                        <p className="text-rose-800 font-medium">検証に失敗しました</p>
+                                        <p className="text-sm text-rose-700 mt-1">{error}</p>
                                         <button
                                             onClick={handleVerify}
-                                            className="mt-3 text-sm text-rose-300 hover:text-rose-200 flex items-center gap-1"
+                                            className="mt-3 text-sm text-rose-600 hover:text-rose-800 flex items-center gap-1 font-medium"
                                         >
                                             <RefreshCw className="w-4 h-4" />
                                             再試行
@@ -253,23 +253,23 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
 
                                 {/* 修正なし */}
                                 {(!result.corrections || result.corrections.length === 0) && result.isVerified && (
-                                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3">
-                                        <CheckCircle className="w-6 h-6 text-emerald-400" />
+                                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+                                        <CheckCircle className="w-6 h-6 text-emerald-600" />
                                         <div>
-                                            <p className="text-emerald-300 font-medium">情報は正確です</p>
-                                            <p className="text-sm text-emerald-200/70">修正が必要な項目は見つかりませんでした</p>
+                                            <p className="text-emerald-800 font-medium">情報は正確です</p>
+                                            <p className="text-sm text-emerald-700">修正が必要な項目は見つかりませんでした</p>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* 警告 */}
                                 {result.warnings && result.warnings.length > 0 && (
-                                    <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                                        <h4 className="text-sm font-medium text-amber-300 mb-2">注意事項</h4>
+                                    <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+                                        <h4 className="text-sm font-semibold text-amber-800 mb-2">注意事項</h4>
                                         <ul className="space-y-1">
                                             {result.warnings.map((warning, index) => (
-                                                <li key={index} className="text-sm text-amber-200/70 flex items-start gap-2">
-                                                    <span className="text-amber-400">•</span>
+                                                <li key={index} className="text-sm text-amber-700 flex items-start gap-2">
+                                                    <span className="text-amber-500">•</span>
                                                     {warning}
                                                 </li>
                                             ))}
@@ -285,7 +285,7 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                         <button
                             onClick={handleVerify}
                             disabled={isVerifying}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors disabled:opacity-50"
                         >
                             <RefreshCw className={`w-4 h-4 ${isVerifying ? 'animate-spin' : ''}`} />
                             再検証

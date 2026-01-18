@@ -1,6 +1,6 @@
-import { ExternalLink, Trash2, Key, DollarSign, Building2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { ExternalLink, Trash2, Key, DollarSign, Building2, AlertTriangle, CheckCircle, XCircle, Heart, Tag as TagIcon } from 'lucide-react';
 
-export default function ApiCard({ api, onSelect, onDelete }) {
+export default function ApiCard({ api, onSelect, onDelete, onToggleFavorite }) {
     const getStatusConfig = (status) => {
         switch (status) {
             case 'deprecated':
@@ -50,6 +50,11 @@ export default function ApiCard({ api, onSelect, onDelete }) {
         onDelete(api);
     };
 
+    const handleToggleFavorite = (e) => {
+        e.stopPropagation();
+        onToggleFavorite(api.id);
+    };
+
     return (
         <div
             onClick={() => onSelect(api)}
@@ -69,14 +74,28 @@ export default function ApiCard({ api, onSelect, onDelete }) {
                     </div>
                 </div>
 
-                {/* Delete Button */}
-                <button
-                    onClick={handleDelete}
-                    className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-100 text-slate-400 hover:text-rose-500 transition-all"
-                    title="削除"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                    {/* Favorite Button */}
+                    <button
+                        onClick={handleToggleFavorite}
+                        className={`p-2 rounded-lg transition-all ${api.isFavorite
+                            ? 'text-rose-500 bg-rose-50'
+                            : 'text-slate-400 hover:text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100'
+                            }`}
+                        title={api.isFavorite ? 'お気に入り解除' : 'お気に入り追加'}
+                    >
+                        <Heart className={`w-4 h-4 ${api.isFavorite ? 'fill-current' : ''}`} />
+                    </button>
+
+                    {/* Delete Button */}
+                    <button
+                        onClick={handleDelete}
+                        className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-100 text-slate-400 hover:text-rose-500 transition-all"
+                        title="削除"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
             </div>
 
             {/* API Name & Provider */}
@@ -105,6 +124,16 @@ export default function ApiCard({ api, onSelect, onDelete }) {
                     <DollarSign className="w-3 h-3" />
                     <span>{api.pricing}</span>
                 </div>
+                {/* Custom Tags */}
+                {api.tags && api.tags.map((tag, index) => (
+                    <div
+                        key={index}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-xs text-indigo-700"
+                    >
+                        <TagIcon className="w-3 h-3" />
+                        <span>{tag}</span>
+                    </div>
+                ))}
             </div>
 
             {/* Footer */}

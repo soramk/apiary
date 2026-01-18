@@ -1,7 +1,7 @@
 import { Database, Search as SearchIcon } from 'lucide-react';
 import ApiCard from './ApiCard';
 
-export default function ApiGrid({ apis, onSelect, onDelete, isLoading }) {
+export default function ApiGrid({ apis, onSelect, onDelete, onToggleFavorite, isLoading }) {
     if (isLoading) {
         return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
@@ -62,6 +62,7 @@ export default function ApiGrid({ apis, onSelect, onDelete, isLoading }) {
                             api={api}
                             onSelect={onSelect}
                             onDelete={onDelete}
+                            onToggleFavorite={onToggleFavorite}
                         />
                     </div>
                 ))}
