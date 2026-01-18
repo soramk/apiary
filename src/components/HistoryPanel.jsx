@@ -8,15 +8,14 @@ import {
     Timer,
     CheckCircle,
     XCircle,
-    Download,
-    Trash2,
-    ChevronDown,
-    ChevronRight,
-    FileJson,
     X,
     Eye,
     BarChart3,
-    RefreshCw
+    RefreshCw,
+    ShieldCheck,
+    ListFilter,
+    FileCode,
+    Link2
 } from 'lucide-react';
 import {
     getAllHistory,
@@ -37,6 +36,7 @@ export default function HistoryPanel({ isOpen, onClose }) {
     const [isLoading, setIsLoading] = useState(false);
     const [view, setView] = useState('list'); // 'list' | 'stats'
     const [filter, setFilter] = useState('all'); // 'all' | 'success' | 'failed'
+    const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'search' | 'url_import' | 'verify' | 'status_check' | 'code_gen'
 
     // 履歴を読み込む
     const loadHistory = async () => {
@@ -63,10 +63,33 @@ export default function HistoryPanel({ isOpen, onClose }) {
 
     // フィルタリングされた履歴
     const filteredHistory = history.filter((entry) => {
-        if (filter === 'success') return entry.success;
-        if (filter === 'failed') return !entry.success;
+        // 成功/失敗フィルター
+        if (filter === 'success' && !entry.success) return false;
+        if (filter === 'failed' && entry.success) return false;
+
+        // タイプフィルター
+        if (typeFilter !== 'all' && entry.type !== typeFilter) return false;
+
         return true;
     });
+
+    // タイプのラベルとアイコンを取得
+    const getTypeInfo = (type) => {
+        switch (type) {
+            case 'search':
+                return { label: 'API検索', icon: Search, color: 'text-pink-500', bg: 'bg-pink-50' };
+            case 'url_import':
+                return { label: 'URL分析', icon: Link2, color: 'text-violet-500', bg: 'bg-violet-50' };
+            case 'verify':
+                return { label: 'AI再検証', icon: ShieldCheck, color: 'text-indigo-500', bg: 'bg-indigo-50' };
+            case 'status_check':
+                return { label: 'ステータス', icon: RefreshCw, color: 'text-blue-500', bg: 'bg-blue-50' };
+            case 'code_gen':
+                return { label: 'コード生成', icon: FileCode, color: 'text-emerald-500', bg: 'bg-emerald-50' };
+            default:
+                return { label: '不明', icon: History, color: 'text-slate-500', bg: 'bg-slate-50' };
+        }
+    };
 
     // エントリの展開/折りたたみ
     const toggleEntry = (id) => {
@@ -288,24 +311,48 @@ export default function HistoryPanel({ isOpen, onClose }) {
                         /* 履歴一覧ビュー */
                         <div className="p-4">
                             {/* フィルター */}
-                            <div className="flex gap-2 mb-4">
-                                {['all', 'success', 'failed'].map((f) => (
-                                    <button
-                                        key={f}
-                                        onClick={() => setFilter(f)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filter === f
-                                            ? 'bg-pink-100 text-pink-700'
-                                            : 'bg-white text-slate-500 hover:text-slate-700 border border-slate-200'
-                                            }`}
-                                    >
-                                        {f === 'all' && '全て'}
-                                        {f === 'success' && '成功のみ'}
-                                        {f === 'failed' && '失敗のみ'}
-                                    </button>
-                                ))}
-                                <span className="ml-auto text-sm text-slate-600">
-                                    {filteredHistory.length}件
-                                </span>
+                            <div className="space-y-3 mb-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {[
+                                        { id: 'all', label: '全て' },
+                                        { id: 'search', label: 'API検索' },
+                                        { id: 'url_import', label: 'URL分析' },
+                                        { id: 'verify', label: 'AI再検証' },
+                                        { id: 'status_check', label: 'ステータス' },
+                                        { id: 'code_gen', label: 'コード生成' }
+                                    ].map((t) => (
+                                        <button
+                                            key={t.id}
+                                            onClick={() => setTypeFilter(t.id)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${typeFilter === t.id
+                                                ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                                                : 'bg-white text-slate-500 hover:text-slate-700 border border-slate-200'
+                                                } border`}
+                                        >
+                                            {t.id !== 'all' && <ListFilter className="w-3 h-3" />}
+                                            {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {['all', 'success', 'failed'].map((f) => (
+                                        <button
+                                            key={f}
+                                            onClick={() => setFilter(f)}
+                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filter === f
+                                                ? 'bg-pink-100 text-pink-700'
+                                                : 'bg-white text-slate-500 hover:text-slate-700 border border-slate-200'
+                                                }`}
+                                        >
+                                            {f === 'all' && '全結果'}
+                                            {f === 'success' && '成功'}
+                                            {f === 'failed' && '失敗'}
+                                        </button>
+                                    ))}
+                                    <span className="ml-auto text-xs text-slate-500 font-medium">
+                                        {filteredHistory.length} 件の履歴
+                                    </span>
+                                </div>
                             </div>
 
                             {/* 履歴リスト */}
@@ -318,11 +365,10 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                 <div className="space-y-2">
                                     {filteredHistory.map((entry) => {
                                         const isExpanded = expandedEntries.has(entry.id);
-
                                         return (
                                             <div
                                                 key={entry.id}
-                                                className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm"
+                                                className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                                             >
                                                 {/* ヘッダー */}
                                                 <div
@@ -336,16 +382,26 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                                             ) : (
                                                                 <ChevronRight className="w-4 h-4 text-slate-400" />
                                                             )}
+
+                                                            <div className={`p-2 rounded-lg ${getTypeInfo(entry.type).bg}`}>
+                                                                {(() => {
+                                                                    const Icon = getTypeInfo(entry.type).icon;
+                                                                    return <Icon className={`w-4 h-4 ${getTypeInfo(entry.type).color}`} />;
+                                                                })()}
+                                                            </div>
+
                                                             <div>
                                                                 <div className="flex items-center gap-2">
-                                                                    <Search className="w-4 h-4 text-pink-500" />
+                                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                                        {getTypeInfo(entry.type).label}
+                                                                    </span>
                                                                     <span className="font-medium text-slate-800">
                                                                         {entry.keyword}
                                                                     </span>
                                                                     {entry.success ? (
                                                                         <span className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                                                                             <CheckCircle className="w-3 h-3" />
-                                                                            {entry.resultCount}件
+                                                                            {entry.type === 'search' ? `${entry.resultCount}件` : '成功'}
                                                                         </span>
                                                                     ) : (
                                                                         <span className="flex items-center gap-1 text-xs text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">

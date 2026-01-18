@@ -10,10 +10,14 @@ export default function CodeGenerator({ api }) {
     const [copied, setCopied] = useState(false);
 
     const languages = [
-        { id: 'python', name: 'Python', color: 'text-yellow-400' },
-        { id: 'nodejs', name: 'Node.js', color: 'text-green-400' },
-        { id: 'powershell', name: 'PowerShell', color: 'text-blue-400' },
-        { id: 'curl', name: 'cURL', color: 'text-orange-400' }
+        { id: 'python', name: 'Python', color: 'text-yellow-500' },
+        { id: 'nodejs', name: 'Node.js', color: 'text-green-500' },
+        { id: 'javascript_browser', name: 'JS (Fetch)', color: 'text-amber-500' },
+        { id: 'powershell', name: 'PowerShell', color: 'text-sky-500' },
+        { id: 'excel_vba', name: 'エクセルマクロ', color: 'text-emerald-500' },
+        { id: 'google_apps_script', name: 'Google Apps Script', color: 'text-indigo-500' },
+        { id: 'typescript', name: 'TypeScript', color: 'text-blue-600' },
+        { id: 'curl', name: 'cURL', color: 'text-orange-500' }
     ];
 
     const handleGenerate = async () => {

@@ -496,32 +496,56 @@ export async function generateCode(apiInfo, language) {
         python: 'Python (requestsライブラリを使用)',
         nodejs: 'Node.js (fetchまたはaxiosを使用)',
         powershell: 'PowerShell (Invoke-RestMethodを使用)',
-        curl: 'cURL コマンド'
+        curl: 'cURL コマンド',
+        excel_vba: 'Excel VBA (WinHttp.WinHttpRequest.5.1を使用)',
+        google_apps_script: 'Google Apps Script (UrlFetchAppを使用)',
+        javascript_browser: 'JavaScript (Fetch APIを使用)',
+        typescript: 'TypeScript (型定義を含め、fetch APIを使用)'
     };
 
     const authInstruction = apiInfo.authType === 'None'
         ? '2. 認証は不要なため、APIキー等の設定は含めないでください'
         : '2. 認証の設定（プレースホルダーとして YOUR_API_KEY を使用）';
 
-    const prompt = `以下のAPI情報を元に、${languageTemplates[language] || language}で実行可能なサンプルコードを生成してください。
+    const prompt = `あなたは各プログラミング言語に精通した世界トップレベルのシニアソフトウェアエンジニアです。
+提供されたAPI情報を徹底的に分析し、${languageTemplates[language] || language}においてそのままプロダクション環境で利用できるレベルの、堅牢でCopy-Paste Readyなサンプルコードを生成してください。
 
 API情報:
 - 名前: ${apiInfo.name}
-- エンドポイント例: ${apiInfo.endpointExample}
-- 認証方式: ${apiInfo.authType}
 - ベースURL: ${apiInfo.url}
+- 代表的なエンドポイント: ${apiInfo.endpointExample}
+- 認証方式: ${apiInfo.authType}
 
-以下を含めてください:
-1. 必要なインポート/モジュール
+実装の要件:
+1. 指定された言語の最新のベストプラクティスと慣習（命名規則、非同期処理等）に従うこと。
 ${authInstruction}
-3. リクエストの実行
-4. レスポンスの処理
-5. エラーハンドリング
+3. ネットワークエラー、タイムアウト、ステータスコードに応じた詳細なエラーハンドリングを含めること。
+4. レスポンスデータ（JSON等）を適切にパースし、利用しやすい形で出力または返却すること。
+5. TypeScriptの場合はインターフェース等の型定義を正確に行い、Excel VBAの場合はWinHttpオブジェクトの適切な参照と解放を行うこと。
 
-コードのみを返してください。説明文は不要です。`;
+自己検証・再帰的確認:
+出力前に以下のチェックを必ず実行してください：
+- このコードは依存関係が解決されていればそのまま実行可能か？
+- APIのベースURLとエンドポイントの結合ロジックに誤りはないか？
+- エラーハンドリングは単なるログ出力に留まらず、実用的な実装になっているか？
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+回答はコード（コードブロック）のみを出力してください。説明文や導入文は一切不要です。`;
+
+    const startTime = performance.now();
+    const historyEntry = {
+        id: uuidv4(),
+        timestamp: Date.now(),
+        type: 'code_gen',
+        keyword: `${apiInfo.name} (${language})`,
+        model: getModelName(),
+        prompt: prompt,
+        response: null,
+        resultCount: 1,
+        tokenUsage: null,
+        processingTime: 0,
+        success: false,
+        error: null
+    };
 
     try {
         const response = await fetch(
@@ -548,23 +572,54 @@ ${authInstruction}
 
         clearTimeout(timeoutId);
 
+        const processingTime = Math.round(performance.now() - startTime);
+
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.error?.message || 'コード生成に失敗しました');
+            const errMsg = error.error?.message || 'コード生成に失敗しました';
+            historyEntry.processingTime = processingTime;
+            historyEntry.error = errMsg;
+            await saveSearchHistory(historyEntry);
+            throw new Error(errMsg);
         }
 
         const data = await response.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
+        const tokenUsage = {
+            promptTokens: data.usageMetadata?.promptTokenCount || null,
+            completionTokens: data.usageMetadata?.candidatesTokenCount || null,
+            totalTokens: data.usageMetadata?.totalTokenCount || null
+        };
+
         if (!text) {
+            historyEntry.processingTime = processingTime;
+            historyEntry.tokenUsage = tokenUsage;
+            historyEntry.error = 'AIからの応答が空でした';
+            await saveSearchHistory(historyEntry);
             throw new Error('AIからの応答が空でした');
         }
 
         // コードブロックを抽出
         const codeMatch = text.match(/```[\w]*\n?([\s\S]*?)```/);
-        return codeMatch ? codeMatch[1].trim() : text.trim();
+        const result = codeMatch ? codeMatch[1].trim() : text.trim();
+
+        historyEntry.response = text;
+        historyEntry.tokenUsage = tokenUsage;
+        historyEntry.processingTime = processingTime;
+        historyEntry.success = true;
+        await saveSearchHistory(historyEntry);
+
+        return result;
     } catch (error) {
         clearTimeout(timeoutId);
+        const processingTime = Math.round(performance.now() - startTime);
+
+        if (!historyEntry.error) {
+            historyEntry.processingTime = processingTime;
+            historyEntry.error = error.message;
+            await saveSearchHistory(historyEntry);
+        }
 
         if (error.name === 'AbortError') {
             throw new Error('リクエストがタイムアウトしました（60秒）');
@@ -599,8 +654,21 @@ URL: ${apiInfo.url}
 
 JSONのみを返してください。`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+    const startTime = performance.now();
+    const historyEntry = {
+        id: uuidv4(),
+        timestamp: Date.now(),
+        type: 'status_check',
+        keyword: apiInfo.name,
+        model: getModelName(),
+        prompt: prompt,
+        response: null,
+        resultCount: 1,
+        tokenUsage: null,
+        processingTime: 0,
+        success: false,
+        error: null
+    };
 
     try {
         const response = await fetch(
@@ -627,25 +695,60 @@ JSONのみを返してください。`;
 
         clearTimeout(timeoutId);
 
+        const processingTime = Math.round(performance.now() - startTime);
+
         if (!response.ok) {
-            throw new Error('ステータスチェックに失敗しました');
+            const errMsg = 'ステータスチェックに失敗しました';
+            historyEntry.processingTime = processingTime;
+            historyEntry.error = errMsg;
+            await saveSearchHistory(historyEntry);
+            throw new Error(errMsg);
         }
 
         const data = await response.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
+        const tokenUsage = {
+            promptTokens: data.usageMetadata?.promptTokenCount || null,
+            completionTokens: data.usageMetadata?.candidatesTokenCount || null,
+            totalTokens: data.usageMetadata?.totalTokenCount || null
+        };
+
         if (!text) {
+            historyEntry.processingTime = processingTime;
+            historyEntry.tokenUsage = tokenUsage;
+            historyEntry.error = 'AIからの応答が空でした';
+            await saveSearchHistory(historyEntry);
             throw new Error('AIからの応答が空でした');
         }
 
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
+            historyEntry.processingTime = processingTime;
+            historyEntry.tokenUsage = tokenUsage;
+            historyEntry.response = text;
+            historyEntry.error = '応答からJSONを抽出できませんでした';
+            await saveSearchHistory(historyEntry);
             throw new Error('応答からJSONを抽出できませんでした');
         }
 
-        return JSON.parse(jsonMatch[0]);
+        const result = JSON.parse(jsonMatch[0]);
+        historyEntry.response = text;
+        historyEntry.tokenUsage = tokenUsage;
+        historyEntry.processingTime = processingTime;
+        historyEntry.success = true;
+        await saveSearchHistory(historyEntry);
+
+        return result;
     } catch (error) {
         clearTimeout(timeoutId);
+        const processingTime = Math.round(performance.now() - startTime);
+
+        if (!historyEntry.error) {
+            historyEntry.processingTime = processingTime;
+            historyEntry.error = error.message;
+            await saveSearchHistory(historyEntry);
+        }
 
         if (error.name === 'AbortError') {
             throw new Error('リクエストがタイムアウトしました');
