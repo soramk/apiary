@@ -13,18 +13,19 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
 
     return (
         <section className="relative py-16 lg:py-24 overflow-hidden">
-            {/* Background Effects */}
+            {/* Background Effects - ロゴカラーに合わせる */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-400/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl"></div>
             </div>
 
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 {/* Hero Text */}
                 <div className="mb-8 animate-fade-in">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-6">
-                        <Sparkles className="w-4 h-4 text-indigo-400" />
-                        <span className="text-sm text-indigo-300">Powered by Gemini AI</span>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-500/10 border border-pink-400/30 mb-6">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span className="text-sm text-pink-300">Powered by Gemini AI</span>
                     </div>
 
                     <h2 className="text-4xl lg:text-5xl font-bold mb-4">
@@ -33,7 +34,7 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                         <span className="text-white">API養蜂場を育てよう</span>
                     </h2>
 
-                    <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                    <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                         キーワードを入力するだけで、AIが蜂のように世界中を飛び回り、
                         Web APIという蜜を集めてきます。あなただけのAPIデータベースを育ててください。
                     </p>
@@ -42,7 +43,7 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                 {/* Search Form */}
                 <form onSubmit={handleSubmit} className="animate-slide-up">
                     <div className="relative max-w-2xl mx-auto">
-                        <div className="relative glass rounded-2xl p-2 shadow-2xl shadow-indigo-500/10">
+                        <div className="relative glass rounded-2xl p-2 shadow-2xl shadow-pink-500/10">
                             <div className="flex items-center gap-2">
                                 <div className="flex-1 relative">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
