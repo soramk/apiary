@@ -6,10 +6,11 @@ import {
     Building2,
     Search,
     Tag,
-    Filter,
     X,
     FolderOpen,
-    Folder
+    Folder,
+    Check,
+    Filter
 } from 'lucide-react';
 
 /**
@@ -31,6 +32,7 @@ const GROUP_LABELS = {
 
 /**
  * サイドバーコンポーネント
+ * フィルターは複数選択可能（同じグループタイプ内で複数の値を選択可能）
  */
 export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen, onToggle }) {
     const [groupBy, setGroupBy] = useState(GROUP_TYPES.CATEGORY);
@@ -56,8 +58,17 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
         return sortedEntries;
     }, [apis, groupBy]);
 
+    // 現在のグループタイプで選択されているフィルター値の配列を取得
+    const currentFilters = useMemo(() => {
+        const filterValue = selectedFilters[groupBy];
+        if (!filterValue) return [];
+        if (Array.isArray(filterValue)) return filterValue;
+        return [filterValue];
+    }, [selectedFilters, groupBy]);
+
     // グループの展開/折りたたみ
-    const toggleGroup = (groupName) => {
+    const toggleExpand = (groupName, e) => {
+        e.stopPropagation();
         setExpandedGroups((prev) => {
             const next = new Set(prev);
             if (next.has(groupName)) {
@@ -65,18 +76,49 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
             } else {
                 next.add(groupName);
             }
+            // 'all' を削除（個別に展開状態を管理）
+            next.delete('all');
             return next;
         });
     };
 
-    // フィルターの選択/解除
+    // フィルターの選択/解除（複数選択対応）
     const handleFilterToggle = (groupName) => {
         const newFilters = { ...selectedFilters };
-        if (newFilters[groupBy] === groupName) {
-            delete newFilters[groupBy];
+        const currentValues = currentFilters;
+
+        if (currentValues.includes(groupName)) {
+            // 既に選択されている場合は解除
+            const newValues = currentValues.filter((v) => v !== groupName);
+            if (newValues.length === 0) {
+                delete newFilters[groupBy];
+            } else {
+                newFilters[groupBy] = newValues;
+            }
         } else {
-            newFilters[groupBy] = groupName;
+            // 新規選択（配列に追加）
+            newFilters[groupBy] = [...currentValues, groupName];
         }
+
+        onFilterChange(newFilters);
+    };
+
+    // 特定のフィルター値を削除
+    const removeFilter = (type, value) => {
+        const newFilters = { ...selectedFilters };
+        const values = newFilters[type];
+
+        if (Array.isArray(values)) {
+            const newValues = values.filter((v) => v !== value);
+            if (newValues.length === 0) {
+                delete newFilters[type];
+            } else {
+                newFilters[type] = newValues;
+            }
+        } else {
+            delete newFilters[type];
+        }
+
         onFilterChange(newFilters);
     };
 
@@ -87,6 +129,28 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
 
     // フィルターがアクティブかどうか
     const hasActiveFilters = Object.keys(selectedFilters).length > 0;
+
+    // アクティブなフィルターの総数
+    const activeFilterCount = useMemo(() => {
+        return Object.values(selectedFilters).reduce((count, value) => {
+            if (Array.isArray(value)) return count + value.length;
+            return count + 1;
+        }, 0);
+    }, [selectedFilters]);
+
+    // フィルターを配列として展開
+    const flattenedFilters = useMemo(() => {
+        const result = [];
+        Object.entries(selectedFilters).forEach(([type, value]) => {
+            const typeLabel = GROUP_LABELS[type]?.label || type;
+            if (Array.isArray(value)) {
+                value.forEach((v) => result.push({ type, value: v, typeLabel }));
+            } else {
+                result.push({ type, value, typeLabel });
+            }
+        });
+        return result;
+    }, [selectedFilters]);
 
     const GroupIcon = GROUP_LABELS[groupBy].icon;
 
@@ -99,6 +163,11 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                 aria-label="サイドバーを開く"
             >
                 <Filter className="w-5 h-5 text-slate-300" />
+                {activeFilterCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center">
+                        {activeFilterCount}
+                    </span>
+                )}
             </button>
 
             {/* オーバーレイ（モバイル） */}
@@ -124,8 +193,8 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                 <div className="p-4 border-b border-slate-700/50">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Layers className="w-5 h-5 text-indigo-400" />
-                            グループ表示
+                            <Filter className="w-5 h-5 text-indigo-400" />
+                            フィルター
                         </h2>
                         <button
                             onClick={onToggle}
@@ -159,36 +228,30 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
 
                 {/* アクティブフィルター表示 */}
                 {hasActiveFilters && (
-                    <div className="px-4 py-2 bg-indigo-500/10 border-b border-slate-700/50">
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs text-indigo-300">
-                                フィルター適用中
+                    <div className="px-4 py-3 bg-indigo-500/10 border-b border-slate-700/50">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-indigo-300">
+                                フィルター適用中 ({activeFilterCount}件)
                             </span>
                             <button
                                 onClick={clearAllFilters}
-                                className="text-xs text-slate-400 hover:text-white transition-colors"
+                                className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"
                             >
-                                クリア
+                                <X className="w-3 h-3" />
+                                すべてクリア
                             </button>
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                            {Object.entries(selectedFilters).map(([key, value]) => (
-                                <span
-                                    key={key}
-                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs"
+                        <div className="flex flex-wrap gap-1.5">
+                            {flattenedFilters.map(({ type, value, typeLabel }) => (
+                                <button
+                                    key={`${type}-${value}`}
+                                    onClick={() => removeFilter(type, value)}
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs transition-colors group"
                                 >
-                                    {value}
-                                    <button
-                                        onClick={() => {
-                                            const newFilters = { ...selectedFilters };
-                                            delete newFilters[key];
-                                            onFilterChange(newFilters);
-                                        }}
-                                        className="hover:text-white"
-                                    >
-                                        <X className="w-3 h-3" />
-                                    </button>
-                                </span>
+                                    <span className="text-indigo-400/70">{typeLabel}:</span>
+                                    <span>{value}</span>
+                                    <X className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -203,38 +266,49 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                         </div>
                     ) : (
                         <div className="space-y-1">
+                            {/* ヒントメッセージ */}
+                            <div className="px-3 py-2 text-xs text-slate-500">
+                                クリックで選択（複数選択可）
+                            </div>
+
                             {groupedApis.map(([groupName, groupApis]) => {
-                                const isExpanded = expandedGroups.has(groupName) || expandedGroups.has('all');
-                                const isSelected = selectedFilters[groupBy] === groupName;
+                                const isExpanded = expandedGroups.has(groupName);
+                                const isSelected = currentFilters.includes(groupName);
 
                                 return (
-                                    <div key={groupName} className="group">
-                                        {/* グループヘッダー */}
-                                        <div
+                                    <div key={groupName}>
+                                        {/* グループヘッダー（クリックでフィルター） */}
+                                        <button
+                                            onClick={() => handleFilterToggle(groupName)}
                                             className={`
-                                                flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer
-                                                transition-all duration-200
+                                                w-full flex items-center justify-between px-3 py-2.5 rounded-lg
+                                                transition-all duration-200 text-left
                                                 ${isSelected
                                                     ? 'bg-indigo-500/20 border border-indigo-500/50'
                                                     : 'hover:bg-slate-700/30 border border-transparent'
                                                 }
                                             `}
                                         >
-                                            <div
-                                                className="flex items-center gap-2 flex-1"
-                                                onClick={() => toggleGroup(groupName)}
-                                            >
-                                                {isExpanded ? (
-                                                    <ChevronDown className="w-4 h-4 text-slate-500" />
-                                                ) : (
-                                                    <ChevronRight className="w-4 h-4 text-slate-500" />
-                                                )}
-                                                <GroupIcon className="w-4 h-4 text-slate-400" />
+                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                {/* チェックボックス表示 */}
+                                                <div className={`
+                                                    w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
+                                                    transition-all duration-200
+                                                    ${isSelected
+                                                        ? 'bg-indigo-500 border-indigo-500'
+                                                        : 'border-slate-500 hover:border-slate-400'
+                                                    }
+                                                `}>
+                                                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                                                </div>
+
+                                                <GroupIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
                                                 <span className={`text-sm font-medium truncate ${isSelected ? 'text-indigo-300' : 'text-slate-300'}`}>
                                                     {groupName}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-2">
+
+                                            <div className="flex items-center gap-2 flex-shrink-0">
                                                 <span className={`
                                                     px-2 py-0.5 rounded-full text-xs font-medium
                                                     ${isSelected
@@ -244,37 +318,37 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                 `}>
                                                     {groupApis.length}
                                                 </span>
+
+                                                {/* 展開ボタン */}
                                                 <button
-                                                    onClick={() => handleFilterToggle(groupName)}
-                                                    className={`
-                                                        p-1 rounded transition-colors
-                                                        ${isSelected
-                                                            ? 'text-indigo-400 hover:text-indigo-300'
-                                                            : 'text-slate-500 hover:text-slate-300 opacity-0 group-hover:opacity-100'
-                                                        }
-                                                    `}
-                                                    title={isSelected ? 'フィルター解除' : 'このグループでフィルター'}
+                                                    onClick={(e) => toggleExpand(groupName, e)}
+                                                    className="p-1 rounded hover:bg-slate-600/50 text-slate-500 hover:text-slate-300 transition-colors"
+                                                    title="詳細を表示"
                                                 >
-                                                    <Filter className="w-3.5 h-3.5" />
+                                                    {isExpanded ? (
+                                                        <ChevronDown className="w-4 h-4" />
+                                                    ) : (
+                                                        <ChevronRight className="w-4 h-4" />
+                                                    )}
                                                 </button>
                                             </div>
-                                        </div>
+                                        </button>
 
                                         {/* グループ内のAPIリスト */}
                                         {isExpanded && (
-                                            <div className="ml-6 mt-1 space-y-0.5">
+                                            <div className="ml-8 mt-1 mb-2 space-y-0.5 animate-fade-in">
                                                 {groupApis.slice(0, 5).map((api) => (
                                                     <div
                                                         key={api.id}
-                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-700/20 cursor-default transition-colors"
+                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-400"
                                                     >
                                                         <Folder className="w-3.5 h-3.5 text-slate-500" />
                                                         <span className="truncate">{api.name}</span>
                                                     </div>
                                                 ))}
                                                 {groupApis.length > 5 && (
-                                                    <div className="px-3 py-1 text-xs text-slate-500">
-                                                        +{groupApis.length - 5} 件
+                                                    <div className="px-3 py-1 text-xs text-slate-500 italic">
+                                                        他 {groupApis.length - 5} 件...
                                                     </div>
                                                 )}
                                             </div>

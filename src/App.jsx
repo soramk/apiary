@@ -48,15 +48,24 @@ export default function App() {
         loadData();
     }, []);
 
-    // Filter APIs based on selected filters
+    // Filter APIs based on selected filters (複数選択対応)
     const filteredApis = useMemo(() => {
         if (Object.keys(filters).length === 0) {
             return apis;
         }
 
         return apis.filter((api) => {
+            // すべてのフィルタータイプに対してチェック
             return Object.entries(filters).every(([key, value]) => {
                 const apiValue = api[key] || '未分類';
+
+                // 値が配列の場合（複数選択）
+                if (Array.isArray(value)) {
+                    // いずれかの値にマッチすればOK（OR条件）
+                    return value.includes(apiValue);
+                }
+
+                // 単一の値の場合
                 return apiValue === value;
             });
         });
