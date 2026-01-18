@@ -3,7 +3,79 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveSearchHistory } from './history';
 
 const API_TIMEOUT = 60000; // 60秒
-const MODEL_NAME = 'gemini-2.0-flash';
+const DEFAULT_MODEL = 'gemini-2.5-flash-preview-05-20';
+const MODEL_STORAGE_KEY = 'gemini_model_name';
+
+/**
+ * 現在選択されているモデル名を取得
+ */
+export function getModelName() {
+    return localStorage.getItem(MODEL_STORAGE_KEY) || DEFAULT_MODEL;
+}
+
+/**
+ * モデル名を設定
+ */
+export function setModelName(modelName) {
+    localStorage.setItem(MODEL_STORAGE_KEY, modelName);
+}
+
+/**
+ * 利用可能なモデル一覧を取得
+ */
+export async function fetchAvailableModels() {
+    const apiKey = getApiKey();
+
+    if (!apiKey) {
+        throw new Error('APIキーが設定されていません');
+    }
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+        );
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || 'モデル一覧の取得に失敗しました');
+        }
+
+        const data = await response.json();
+
+        // generateContent をサポートするモデルのみフィルタリング
+        const generativeModels = data.models
+            ?.filter((model) =>
+                model.supportedGenerationMethods?.includes('generateContent')
+            )
+            .map((model) => ({
+                name: model.name.replace('models/', ''),
+                displayName: model.displayName,
+                description: model.description,
+                inputTokenLimit: model.inputTokenLimit,
+                outputTokenLimit: model.outputTokenLimit
+            }))
+            .sort((a, b) => {
+                // gemini-3 を最優先
+                if (a.name.includes('gemini-3') && !b.name.includes('gemini-3')) return -1;
+                if (!a.name.includes('gemini-3') && b.name.includes('gemini-3')) return 1;
+                // gemini-2.5 を次に優先
+                if (a.name.includes('gemini-2.5') && !b.name.includes('gemini-2.5')) return -1;
+                if (!a.name.includes('gemini-2.5') && b.name.includes('gemini-2.5')) return 1;
+                // gemini-2.0 を次に優先
+                if (a.name.includes('gemini-2') && !b.name.includes('gemini-2')) return -1;
+                if (!a.name.includes('gemini-2') && b.name.includes('gemini-2')) return 1;
+                // flash を優先
+                if (a.name.includes('flash') && !b.name.includes('flash')) return -1;
+                if (!a.name.includes('flash') && b.name.includes('flash')) return 1;
+                return a.name.localeCompare(b.name);
+            }) || [];
+
+        return generativeModels;
+    } catch (error) {
+        console.error('モデル一覧取得エラー:', error);
+        throw error;
+    }
+}
 
 /**
  * APIキーを取得（ローカルストレージから）
@@ -72,7 +144,7 @@ export async function searchApis(keyword, saveHistory = true) {
         timestamp: Date.now(),
         type: 'search',
         keyword: keyword,
-        model: MODEL_NAME,
+        model: getModelName(),
         prompt: prompt,
         response: null,
         resultCount: 0,
@@ -84,7 +156,7 @@ export async function searchApis(keyword, saveHistory = true) {
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: {
@@ -261,7 +333,7 @@ URL: "${url}"
         timestamp: Date.now(),
         type: 'url_import',
         keyword: url,
-        model: MODEL_NAME,
+        model: getModelName(),
         prompt: prompt,
         response: null,
         resultCount: 0,
@@ -273,7 +345,7 @@ URL: "${url}"
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: {
@@ -578,3 +650,156 @@ JSONのみを返してください。`;
         throw error;
     }
 }
+
+/**
+ * API情報を再検証し、修正された情報を返す
+ * @param {Object} apiInfo - 検証するAPI情報
+ * @returns {Promise<Object>} - 検証結果と修正されたAPI情報
+ */
+export async function verifyApiInfo(apiInfo) {
+    const apiKey = getApiKey();
+    const startTime = performance.now();
+
+    if (!apiKey) {
+        throw new Error('Gemini APIキーが設定されていません');
+    }
+
+    const prompt = `あなたは熟練したAPI検証エキスパートです。以下のAPI情報が正確かどうかを確認し、間違いがあれば修正してください。
+
+検証対象のAPI情報:
+${JSON.stringify(apiInfo, null, 2)}
+
+以下のJSON形式で、検証結果を返してください。JSONのみを返し、他の説明文は不要です。
+
+{
+  "isVerified": true/false（情報が確認できたかどうか）,
+  "accuracy": "high/medium/low"（情報の正確性）,
+  "corrections": [
+    {
+      "field": "修正したフィールド名",
+      "original": "元の値",
+      "corrected": "修正後の値",
+      "reason": "修正理由"
+    }
+  ],
+  "verifiedApi": {
+    "name": "正確なAPI名",
+    "provider": "正確なプロバイダー名",
+    "category": "正確なカテゴリ",
+    "description": "正確な概要",
+    "longDescription": "正確な詳細説明",
+    "useCases": ["正確なユースケース1", "ユースケース2"],
+    "authType": "正確な認証方式",
+    "pricing": "正確な料金モデル",
+    "url": "正確な公式URL",
+    "endpointExample": "正確なエンドポイント例",
+    "responseExample": {"正確なレスポンス例": "値"},
+    "status": "active/deprecated/eol"
+  },
+  "warnings": ["注意事項があれば記載"],
+  "lastKnownUpdate": "このAPIの最新情報がいつのものか（わかれば）"
+}
+
+重要:
+- 実際に存在するAPIかどうかを確認してください
+- URLが正しいかどうかを確認してください
+- 料金や認証方式が最新かどうかを確認してください
+- 情報が確認できない場合は isVerified を false にしてください
+- JSONのみを返し、マークダウンの装飾は不要です`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+    // 履歴エントリの初期化
+    const historyEntry = {
+        id: uuidv4(),
+        timestamp: Date.now(),
+        type: 'verify',
+        keyword: apiInfo.name,
+        model: getModelName(),
+        prompt: prompt,
+        response: null,
+        resultCount: 0,
+        tokenUsage: null,
+        processingTime: 0,
+        success: false,
+        error: null
+    };
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [{ text: prompt }]
+                        }
+                    ],
+                    generationConfig: {
+                        temperature: 0.3,
+                        maxOutputTokens: 4096,
+                    }
+                }),
+                signal: controller.signal
+            }
+        );
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || '検証リクエストに失敗しました');
+        }
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        const processingTime = Math.round(performance.now() - startTime);
+        const tokenUsage = {
+            promptTokens: data.usageMetadata?.promptTokenCount || null,
+            completionTokens: data.usageMetadata?.candidatesTokenCount || null,
+            totalTokens: data.usageMetadata?.totalTokenCount || null
+        };
+
+        if (!text) {
+            throw new Error('AIからの応答が空でした');
+        }
+
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('AIの応答からJSONを抽出できませんでした');
+        }
+
+        const result = JSON.parse(jsonMatch[0]);
+
+        // 履歴エントリを完成
+        historyEntry.response = text;
+        historyEntry.resultCount = result.corrections?.length || 0;
+        historyEntry.tokenUsage = tokenUsage;
+        historyEntry.processingTime = processingTime;
+        historyEntry.success = true;
+
+        await saveSearchHistory(historyEntry);
+
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+
+        const processingTime = Math.round(performance.now() - startTime);
+        historyEntry.processingTime = processingTime;
+        historyEntry.error = error.message;
+        await saveSearchHistory(historyEntry);
+
+        if (error.name === 'AbortError') {
+            throw new Error('リクエストがタイムアウトしました（60秒）');
+        }
+
+        throw error;
+    }
+}
+

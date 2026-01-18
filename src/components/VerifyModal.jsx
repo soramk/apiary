@@ -1,0 +1,315 @@
+import { useState } from 'react';
+import {
+    X,
+    Loader2,
+    ShieldCheck,
+    ShieldAlert,
+    ShieldX,
+    CheckCircle,
+    AlertTriangle,
+    ArrowRight,
+    RefreshCw,
+    Save
+} from 'lucide-react';
+import { verifyApiInfo } from '../services/gemini';
+
+/**
+ * AI再検証モーダルコンポーネント
+ */
+export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }) {
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
+
+    // 検証を開始
+    const handleVerify = async () => {
+        setIsVerifying(true);
+        setError(null);
+        setResult(null);
+
+        try {
+            const verificationResult = await verifyApiInfo(api);
+            setResult(verificationResult);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsVerifying(false);
+        }
+    };
+
+    // 修正を適用
+    const handleApply = () => {
+        if (result?.verifiedApi) {
+            onApplyCorrections({
+                ...api,
+                ...result.verifiedApi,
+                lastVerifiedAt: Date.now()
+            });
+            onClose();
+        }
+    };
+
+    // 正確性に応じたアイコンと色を取得
+    const getAccuracyConfig = (accuracy) => {
+        switch (accuracy) {
+            case 'high':
+                return {
+                    icon: ShieldCheck,
+                    color: 'text-emerald-400',
+                    bgColor: 'bg-emerald-500/10',
+                    borderColor: 'border-emerald-500/30',
+                    label: '高信頼度'
+                };
+            case 'medium':
+                return {
+                    icon: ShieldAlert,
+                    color: 'text-amber-400',
+                    bgColor: 'bg-amber-500/10',
+                    borderColor: 'border-amber-500/30',
+                    label: '中信頼度'
+                };
+            case 'low':
+                return {
+                    icon: ShieldX,
+                    color: 'text-rose-400',
+                    bgColor: 'bg-rose-500/10',
+                    borderColor: 'border-rose-500/30',
+                    label: '低信頼度'
+                };
+            default:
+                return {
+                    icon: ShieldAlert,
+                    color: 'text-slate-400',
+                    bgColor: 'bg-slate-500/10',
+                    borderColor: 'border-slate-500/30',
+                    label: '不明'
+                };
+        }
+    };
+
+    if (!isOpen) return null;
+
+    const accuracyConfig = result?.accuracy ? getAccuracyConfig(result.accuracy) : null;
+    const AccuracyIcon = accuracyConfig?.icon;
+
+    return (
+        <>
+            {/* オーバーレイ */}
+            <div
+                className="fixed inset-0 bg-black/50 z-50"
+                onClick={onClose}
+            />
+
+            {/* モーダル */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div
+                    className="w-full max-w-3xl glass rounded-2xl border border-slate-600/50 shadow-2xl animate-fade-in my-8"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* ヘッダー */}
+                    <div className="p-6 border-b border-slate-700/50">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600">
+                                    <ShieldCheck className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-white">AI再検証</h2>
+                                    <p className="text-sm text-slate-400">
+                                        {api.name} の情報を再検証します
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* コンテンツ */}
+                    <div className="p-6 max-h-[60vh] overflow-y-auto">
+                        {/* 検証前 */}
+                        {!result && !error && !isVerifying && (
+                            <div className="text-center py-8">
+                                <ShieldCheck className="w-16 h-16 text-indigo-400 mx-auto mb-4 opacity-50" />
+                                <h3 className="text-lg font-medium text-white mb-2">
+                                    API情報の検証を開始
+                                </h3>
+                                <p className="text-slate-400 mb-6 max-w-md mx-auto">
+                                    AIが登録されているAPI情報を検証し、誤った情報があれば修正案を提示します。
+                                </p>
+                                <button
+                                    onClick={handleVerify}
+                                    className="btn-primary px-6 py-3 rounded-xl text-white font-medium flex items-center gap-2 mx-auto"
+                                >
+                                    <ShieldCheck className="w-5 h-5" />
+                                    検証を開始
+                                </button>
+                            </div>
+                        )}
+
+                        {/* 検証中 */}
+                        {isVerifying && (
+                            <div className="text-center py-12">
+                                <div className="relative inline-block">
+                                    <Loader2 className="w-16 h-16 text-indigo-400 animate-spin" />
+                                </div>
+                                <h3 className="text-lg font-medium text-white mt-4 mb-2">
+                                    検証中...
+                                </h3>
+                                <p className="text-slate-400">
+                                    AIがAPI情報を確認しています
+                                </p>
+                            </div>
+                        )}
+
+                        {/* エラー */}
+                        {error && (
+                            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
+                                <div className="flex items-start gap-3">
+                                    <AlertTriangle className="w-5 h-5 text-rose-400 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="text-rose-300 font-medium">検証に失敗しました</p>
+                                        <p className="text-sm text-rose-200/70 mt-1">{error}</p>
+                                        <button
+                                            onClick={handleVerify}
+                                            className="mt-3 text-sm text-rose-300 hover:text-rose-200 flex items-center gap-1"
+                                        >
+                                            <RefreshCw className="w-4 h-4" />
+                                            再試行
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 検証結果 */}
+                        {result && (
+                            <div className="space-y-6 animate-fade-in">
+                                {/* 検証ステータス */}
+                                <div className={`p-4 rounded-xl border ${accuracyConfig.bgColor} ${accuracyConfig.borderColor}`}>
+                                    <div className="flex items-center gap-3">
+                                        <AccuracyIcon className={`w-8 h-8 ${accuracyConfig.color}`} />
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`font-semibold ${accuracyConfig.color}`}>
+                                                    {result.isVerified ? '検証完了' : '検証不可'}
+                                                </span>
+                                                <span className={`text-xs px-2 py-0.5 rounded-full ${accuracyConfig.bgColor} ${accuracyConfig.color}`}>
+                                                    {accuracyConfig.label}
+                                                </span>
+                                            </div>
+                                            {result.lastKnownUpdate && (
+                                                <p className="text-sm text-slate-400 mt-1">
+                                                    最新情報: {result.lastKnownUpdate}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 修正箇所 */}
+                                {result.corrections && result.corrections.length > 0 && (
+                                    <div>
+                                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                            <AlertTriangle className="w-4 h-4 text-amber-400" />
+                                            修正が必要な項目 ({result.corrections.length}件)
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {result.corrections.map((correction, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50"
+                                                >
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <span className="text-xs font-medium text-slate-400 uppercase">
+                                                            {correction.field}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <span className="text-rose-300 line-through">
+                                                            {String(correction.original).substring(0, 50)}
+                                                            {String(correction.original).length > 50 ? '...' : ''}
+                                                        </span>
+                                                        <ArrowRight className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                                        <span className="text-emerald-300">
+                                                            {String(correction.corrected).substring(0, 50)}
+                                                            {String(correction.corrected).length > 50 ? '...' : ''}
+                                                        </span>
+                                                    </div>
+                                                    {correction.reason && (
+                                                        <p className="text-xs text-slate-500 mt-2">
+                                                            理由: {correction.reason}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 修正なし */}
+                                {(!result.corrections || result.corrections.length === 0) && result.isVerified && (
+                                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3">
+                                        <CheckCircle className="w-6 h-6 text-emerald-400" />
+                                        <div>
+                                            <p className="text-emerald-300 font-medium">情報は正確です</p>
+                                            <p className="text-sm text-emerald-200/70">修正が必要な項目は見つかりませんでした</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 警告 */}
+                                {result.warnings && result.warnings.length > 0 && (
+                                    <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                                        <h4 className="text-sm font-medium text-amber-300 mb-2">注意事項</h4>
+                                        <ul className="space-y-1">
+                                            {result.warnings.map((warning, index) => (
+                                                <li key={index} className="text-sm text-amber-200/70 flex items-start gap-2">
+                                                    <span className="text-amber-400">•</span>
+                                                    {warning}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* フッター */}
+                    <div className="p-6 border-t border-slate-700/50 bg-slate-800/30 flex items-center justify-between">
+                        <button
+                            onClick={handleVerify}
+                            disabled={isVerifying}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${isVerifying ? 'animate-spin' : ''}`} />
+                            再検証
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={onClose}
+                                className="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                            >
+                                閉じる
+                            </button>
+                            {result?.corrections && result.corrections.length > 0 && (
+                                <button
+                                    onClick={handleApply}
+                                    className="btn-primary px-6 py-2 rounded-lg text-white font-medium flex items-center gap-2"
+                                >
+                                    <Save className="w-4 h-4" />
+                                    修正を適用
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+}

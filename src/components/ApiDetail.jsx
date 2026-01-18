@@ -12,17 +12,23 @@ import {
     XCircle,
     BookOpen,
     Target,
-    Code2
+    Code2,
+    Edit3,
+    ShieldCheck
 } from 'lucide-react';
 import { checkApiStatus } from '../services/gemini';
 import { saveApi } from '../services/database';
 import Playground from './Playground';
 import CodeGenerator from './CodeGenerator';
+import ApiEditModal from './ApiEditModal';
+import VerifyModal from './VerifyModal';
 
 export default function ApiDetail({ api, onBack, onUpdate }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [isChecking, setIsChecking] = useState(false);
     const [statusResult, setStatusResult] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
 
     const tabs = [
         { id: 'overview', label: 'Overview', icon: BookOpen },
@@ -81,6 +87,18 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
         }
     };
 
+    // 編集保存ハンドラー
+    const handleEditSave = async (updatedApi) => {
+        await saveApi(updatedApi);
+        onUpdate?.(updatedApi);
+    };
+
+    // 検証結果適用ハンドラー
+    const handleApplyCorrections = async (correctedApi) => {
+        await saveApi(correctedApi);
+        onUpdate?.(correctedApi);
+    };
+
     return (
         <div className="min-h-screen animate-fade-in">
             {/* Header */}
@@ -112,7 +130,28 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {/* 編集ボタン */}
+                            <button
+                                onClick={() => setShowEditModal(true)}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
+                                title="情報を編集"
+                            >
+                                <Edit3 className="w-4 h-4" />
+                                <span className="hidden sm:inline">編集</span>
+                            </button>
+
+                            {/* AI再検証ボタン */}
+                            <button
+                                onClick={() => setShowVerifyModal(true)}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-violet-300 hover:text-white bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 transition-colors"
+                                title="AIで情報を再検証"
+                            >
+                                <ShieldCheck className="w-4 h-4" />
+                                <span className="hidden sm:inline">再検証</span>
+                            </button>
+
+                            {/* ステータス確認ボタン */}
                             <button
                                 onClick={handleCheckStatus}
                                 disabled={isChecking}
@@ -123,15 +162,17 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                 ) : (
                                     <RefreshCw className="w-4 h-4" />
                                 )}
-                                <span>ステータスを確認</span>
+                                <span className="hidden sm:inline">ステータス</span>
                             </button>
+
+                            {/* 公式サイトリンク */}
                             <a
                                 href={api.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl text-white"
                             >
-                                <span>公式サイト</span>
+                                <span className="hidden sm:inline">公式サイト</span>
                                 <ExternalLink className="w-4 h-4" />
                             </a>
                         </div>
@@ -148,10 +189,10 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                         </div>
                     ) : (
                         <div className={`p-4 rounded-xl border ${statusResult.status === 'active'
-                                ? 'bg-emerald-500/10 border-emerald-500/30'
-                                : statusResult.status === 'deprecated'
-                                    ? 'bg-amber-500/10 border-amber-500/30'
-                                    : 'bg-rose-500/10 border-rose-500/30'
+                            ? 'bg-emerald-500/10 border-emerald-500/30'
+                            : statusResult.status === 'deprecated'
+                                ? 'bg-amber-500/10 border-amber-500/30'
+                                : 'bg-rose-500/10 border-rose-500/30'
                             }`}>
                             <div className="flex items-center gap-2 mb-2">
                                 {statusResult.status === 'active' && (
@@ -198,8 +239,8 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${activeTab === tab.id
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                                            : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                                             }`}
                                     >
                                         <Icon className="w-4 h-4" />
@@ -334,6 +375,23 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            <ApiEditModal
+                api={api}
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSave={handleEditSave}
+            />
+
+            {/* Verify Modal */}
+            <VerifyModal
+                api={api}
+                isOpen={showVerifyModal}
+                onClose={() => setShowVerifyModal(false)}
+                onApplyCorrections={handleApplyCorrections}
+            />
         </div>
     );
 }
+
