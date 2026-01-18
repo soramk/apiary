@@ -1,6 +1,26 @@
 import { useState } from 'react';
-import { Search, Sparkles, Loader2, Link2 } from 'lucide-react';
+import {
+    Search,
+    Sparkles,
+    Loader2,
+    Link2,
+    Sun,
+    CreditCard,
+    MapPin,
+    Brain,
+    Users,
+    ShoppingBag
+} from 'lucide-react';
 import apiaryLogo from '../assets/apiary_logo.png';
+
+const QUICK_KEYWORDS = [
+    { label: 'Weather', icon: Sun, color: 'text-amber-500' },
+    { label: 'Payment', icon: CreditCard, color: 'text-emerald-500' },
+    { label: 'Maps', icon: MapPin, color: 'text-rose-500' },
+    { label: 'AI/ML', icon: Brain, color: 'text-violet-500' },
+    { label: 'Social', icon: Users, color: 'text-sky-500' },
+    { label: 'E-commerce', icon: ShoppingBag, color: 'text-pink-500' },
+];
 
 export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) {
     const [keyword, setKeyword] = useState('');
@@ -48,16 +68,16 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                 {/* Search Form */}
                 <form onSubmit={handleSubmit} className="animate-slide-up">
                     <div className="relative max-w-2xl mx-auto">
-                        <div className="relative glass rounded-2xl p-2 shadow-2xl shadow-pink-500/10">
+                        <div className="relative bg-white/80 backdrop-blur-lg rounded-2xl p-2 shadow-xl shadow-pink-200/30 border border-pink-100">
                             <div className="flex items-center gap-2">
                                 <div className="flex-1 relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-pink-500" />
                                     <input
                                         type="text"
                                         value={keyword}
                                         onChange={(e) => setKeyword(e.target.value)}
                                         placeholder="例: 天気予報, 決済, 画像認識, SNS..."
-                                        className="w-full pl-12 pr-4 py-4 bg-slate-800/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-300 transition-all border border-slate-200"
                                         disabled={isLoading}
                                     />
                                 </div>
@@ -83,14 +103,15 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
 
                         {/* Quick Keywords */}
                         <div className="mt-4 flex flex-wrap justify-center gap-2">
-                            {['Weather', 'Payment', 'Maps', 'AI/ML', 'Social', 'E-commerce'].map((tag) => (
+                            {QUICK_KEYWORDS.map(({ label, icon: Icon, color }) => (
                                 <button
-                                    key={tag}
+                                    key={label}
                                     type="button"
-                                    onClick={() => setKeyword(tag)}
-                                    className="px-3 py-1.5 rounded-lg text-sm text-slate-400 bg-slate-800/50 hover:bg-slate-700/50 hover:text-slate-200 transition-all"
+                                    onClick={() => setKeyword(label)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 bg-white/70 hover:bg-white border border-slate-200 hover:border-pink-300 hover:text-pink-600 transition-all shadow-sm group"
                                 >
-                                    {tag}
+                                    <Icon className={`w-3.5 h-3.5 ${color} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                                    {label}
                                 </button>
                             ))}
                         </div>
@@ -98,16 +119,16 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                         {/* URL Import Button */}
                         <div className="mt-6">
                             <div className="flex items-center justify-center gap-4">
-                                <div className="h-px flex-1 bg-slate-700/50"></div>
-                                <span className="text-xs text-slate-500">または</span>
-                                <div className="h-px flex-1 bg-slate-700/50"></div>
+                                <div className="h-px flex-1 bg-slate-300"></div>
+                                <span className="text-xs text-slate-400">または</span>
+                                <div className="h-px flex-1 bg-slate-300"></div>
                             </div>
                             <button
                                 type="button"
                                 onClick={onOpenUrlImport}
-                                className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 hover:border-indigo-500/50 text-slate-300 hover:text-white transition-all"
+                                className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/80 hover:bg-white border border-slate-200 hover:border-violet-300 text-slate-600 hover:text-violet-600 transition-all shadow-sm"
                             >
-                                <Link2 className="w-4 h-4" />
+                                <Link2 className="w-4 h-4 text-violet-500" />
                                 <span>URLから直接登録</span>
                             </button>
                         </div>

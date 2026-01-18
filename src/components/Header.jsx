@@ -183,10 +183,10 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                                                 setIsMenuOpen(false);
                                                 onOpenSettings?.();
                                             }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors text-left"
                                         >
-                                            <Settings className="w-5 h-5 text-slate-400" />
-                                            <div className="text-sm text-slate-200">設定</div>
+                                            <Settings className="w-5 h-5 text-slate-500" />
+                                            <div className="text-sm text-slate-700">設定</div>
                                         </button>
                                     </div>
                                 </div>
@@ -198,22 +198,22 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
 
             {/* Import Status Toast */}
             {importStatus && (
-                <div className={`fixed bottom-4 right-4 z-50 p-4 rounded-xl shadow-xl animate-slide-up ${importStatus.success
-                    ? 'bg-emerald-500/20 border border-emerald-500/50'
-                    : 'bg-rose-500/20 border border-rose-500/50'
+                <div className={`fixed bottom-4 right-4 z-50 p-4 rounded-xl shadow-xl animate-slide-up bg-white border ${importStatus.success
+                    ? 'border-emerald-200 shadow-emerald-100/50'
+                    : 'border-rose-200 shadow-rose-100/50'
                     }`}>
                     <div className="flex items-center gap-3">
                         {importStatus.success ? (
-                            <Download className="w-5 h-5 text-emerald-400" />
+                            <CheckCircle className="w-5 h-5 text-emerald-500" />
                         ) : (
-                            <X className="w-5 h-5 text-rose-400" />
+                            <XCircle className="w-5 h-5 text-rose-500" />
                         )}
-                        <p className={importStatus.success ? 'text-emerald-200' : 'text-rose-200'}>
+                        <p className={`font-medium ${importStatus.success ? 'text-emerald-700' : 'text-rose-700'}`}>
                             {importStatus.message}
                         </p>
                         <button
                             onClick={() => setImportStatus(null)}
-                            className="ml-2 text-slate-400 hover:text-white"
+                            className="ml-2 text-slate-400 hover:text-slate-600"
                         >
                             <X className="w-4 h-4" />
                         </button>
