@@ -6,19 +6,19 @@ export default function ApiCard({ api, onSelect, onDelete }) {
             case 'deprecated':
                 return {
                     label: 'Deprecated',
-                    className: 'status-deprecated',
+                    className: 'bg-amber-100 text-amber-700 border border-amber-300',
                     icon: AlertTriangle
                 };
             case 'eol':
                 return {
                     label: 'EOL',
-                    className: 'status-eol',
+                    className: 'bg-rose-100 text-rose-700 border border-rose-300',
                     icon: XCircle
                 };
             default:
                 return {
                     label: 'Active',
-                    className: 'status-active',
+                    className: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
                     icon: CheckCircle
                 };
         }
@@ -27,16 +27,20 @@ export default function ApiCard({ api, onSelect, onDelete }) {
     const statusConfig = getStatusConfig(api.status);
     const StatusIcon = statusConfig.icon;
 
+    // 明るいテーマに合わせたカテゴリカラー
     const getCategoryColor = (category) => {
         const colors = {
-            Finance: 'from-emerald-500 to-teal-600',
-            Weather: 'from-blue-500 to-cyan-600',
-            Social: 'from-pink-500 to-rose-600',
-            Maps: 'from-amber-500 to-orange-600',
-            AI: 'from-violet-500 to-purple-600',
-            'AI/ML': 'from-violet-500 to-purple-600',
-            'E-commerce': 'from-indigo-500 to-blue-600',
-            default: 'from-slate-500 to-slate-600'
+            Finance: 'bg-emerald-100 text-emerald-700 border-emerald-300',
+            Weather: 'bg-sky-100 text-sky-700 border-sky-300',
+            Social: 'bg-pink-100 text-pink-700 border-pink-300',
+            Maps: 'bg-amber-100 text-amber-700 border-amber-300',
+            AI: 'bg-violet-100 text-violet-700 border-violet-300',
+            'AI/ML': 'bg-violet-100 text-violet-700 border-violet-300',
+            'E-commerce': 'bg-indigo-100 text-indigo-700 border-indigo-300',
+            Communication: 'bg-cyan-100 text-cyan-700 border-cyan-300',
+            Data: 'bg-blue-100 text-blue-700 border-blue-300',
+            Entertainment: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300',
+            default: 'bg-slate-100 text-slate-700 border-slate-300'
         };
         return colors[category] || colors.default;
     };
@@ -53,13 +57,13 @@ export default function ApiCard({ api, onSelect, onDelete }) {
         >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
                     {/* Category Badge */}
-                    <div className={`px-3 py-1 rounded-lg text-xs font-semibold text-white bg-gradient-to-r ${getCategoryColor(api.category)}`}>
+                    <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getCategoryColor(api.category)}`}>
                         {api.category}
                     </div>
                     {/* Status Indicator */}
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium text-white ${statusConfig.className}`}>
+                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
                         <StatusIcon className="w-3 h-3" />
                         <span>{statusConfig.label}</span>
                     </div>
@@ -68,7 +72,7 @@ export default function ApiCard({ api, onSelect, onDelete }) {
                 {/* Delete Button */}
                 <button
                     onClick={handleDelete}
-                    className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-all"
+                    className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-100 text-slate-400 hover:text-rose-500 transition-all"
                     title="削除"
                 >
                     <Trash2 className="w-4 h-4" />
@@ -77,35 +81,35 @@ export default function ApiCard({ api, onSelect, onDelete }) {
 
             {/* API Name & Provider */}
             <div className="mb-3">
-                <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
+                <h3 className="text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
                     {api.name}
                 </h3>
-                <div className="flex items-center gap-1.5 text-sm text-slate-400">
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
                     <Building2 className="w-3.5 h-3.5" />
                     <span>{api.provider}</span>
                 </div>
             </div>
 
             {/* Description */}
-            <p className="text-sm text-slate-400 line-clamp-3 mb-4">
+            <p className="text-sm text-slate-600 line-clamp-3 mb-4">
                 {api.description}
             </p>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-4">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-700/50 text-xs text-slate-300">
-                    <Key className="w-3 h-3 text-amber-400" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700">
+                    <Key className="w-3 h-3" />
                     <span>{api.authType}</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-700/50 text-xs text-slate-300">
-                    <DollarSign className="w-3 h-3 text-emerald-400" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700">
+                    <DollarSign className="w-3 h-3" />
                     <span>{api.pricing}</span>
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
-                <span className="text-xs text-slate-500">
+            <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                <span className="text-xs text-slate-400">
                     {new Date(api.createdAt).toLocaleDateString('ja-JP')}
                 </span>
                 <a
@@ -113,7 +117,7 @@ export default function ApiCard({ api, onSelect, onDelete }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                    className="flex items-center gap-1 text-xs text-pink-500 hover:text-pink-600 transition-colors"
                 >
                     <span>公式サイト</span>
                     <ExternalLink className="w-3 h-3" />

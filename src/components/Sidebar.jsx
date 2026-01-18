@@ -159,12 +159,12 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
             {/* サイドバートグルボタン（モバイル用） */}
             <button
                 onClick={onToggle}
-                className="lg:hidden fixed top-20 left-4 z-40 p-2 rounded-lg glass hover:bg-slate-700/50 transition-colors"
+                className="lg:hidden fixed top-20 left-4 z-40 p-2 rounded-lg bg-white/80 backdrop-blur border border-pink-200 hover:bg-pink-50 transition-colors shadow-lg"
                 aria-label="サイドバーを開く"
             >
-                <Filter className="w-5 h-5 text-slate-300" />
+                <Filter className="w-5 h-5 text-pink-500" />
                 {activeFilterCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-pink-500 text-white text-xs flex items-center justify-center">
                         {activeFilterCount}
                     </span>
                 )}
@@ -173,7 +173,7 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
             {/* オーバーレイ（モバイル） */}
             {isOpen && (
                 <div
-                    className="lg:hidden fixed inset-0 bg-black/50 z-40"
+                    className="lg:hidden fixed inset-0 bg-black/30 z-40"
                     onClick={onToggle}
                 />
             )}
@@ -183,22 +183,22 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                 className={`
                     fixed lg:sticky top-0 left-0 z-50 lg:z-auto
                     h-screen w-72
-                    glass border-r border-slate-700/50
+                    bg-white/90 backdrop-blur-lg border-r border-pink-100
                     transform transition-transform duration-300 ease-in-out
                     ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                    flex flex-col
+                    flex flex-col shadow-lg
                 `}
             >
                 {/* ヘッダー */}
-                <div className="p-4 border-b border-slate-700/50">
+                <div className="p-4 border-b border-pink-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Filter className="w-5 h-5 text-indigo-400" />
+                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <Filter className="w-5 h-5 text-pink-500" />
                             フィルター
                         </h2>
                         <button
                             onClick={onToggle}
-                            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+                            className="lg:hidden p-1.5 rounded-lg hover:bg-pink-50 text-slate-400 hover:text-slate-600 transition-colors"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -214,8 +214,8 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                     flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
                                     transition-all duration-200
                                     ${groupBy === type
-                                        ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/50'
-                                        : 'bg-slate-700/30 text-slate-400 border border-transparent hover:bg-slate-700/50 hover:text-slate-300'
+                                        ? 'bg-pink-100 text-pink-700 border border-pink-300'
+                                        : 'bg-slate-50 text-slate-500 border border-transparent hover:bg-slate-100 hover:text-slate-700'
                                     }
                                 `}
                             >
@@ -228,14 +228,14 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
 
                 {/* アクティブフィルター表示 */}
                 {hasActiveFilters && (
-                    <div className="px-4 py-3 bg-indigo-500/10 border-b border-slate-700/50">
+                    <div className="px-4 py-3 bg-pink-50 border-b border-pink-100">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium text-indigo-300">
+                            <span className="text-xs font-medium text-pink-700">
                                 フィルター適用中 ({activeFilterCount}件)
                             </span>
                             <button
                                 onClick={clearAllFilters}
-                                className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                                className="text-xs text-slate-500 hover:text-slate-700 transition-colors flex items-center gap-1"
                             >
                                 <X className="w-3 h-3" />
                                 すべてクリア
@@ -246,9 +246,9 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                 <button
                                     key={`${type}-${value}`}
                                     onClick={() => removeFilter(type, value)}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs transition-colors group"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-pink-200 hover:border-pink-300 text-pink-700 text-xs transition-colors group shadow-sm"
                                 >
-                                    <span className="text-indigo-400/70">{typeLabel}:</span>
+                                    <span className="text-pink-400">{typeLabel}:</span>
                                     <span>{value}</span>
                                     <X className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                                 </button>
@@ -260,14 +260,14 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                 {/* グループリスト */}
                 <div className="flex-1 overflow-y-auto p-2">
                     {groupedApis.length === 0 ? (
-                        <div className="text-center py-8 text-slate-500">
+                        <div className="text-center py-8 text-slate-400">
                             <FolderOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
                             <p className="text-sm">APIがありません</p>
                         </div>
                     ) : (
                         <div className="space-y-1">
                             {/* ヒントメッセージ */}
-                            <div className="px-3 py-2 text-xs text-slate-500">
+                            <div className="px-3 py-2 text-xs text-slate-400">
                                 クリックで選択（複数選択可）
                             </div>
 
@@ -284,8 +284,8 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                 w-full flex items-center justify-between px-3 py-2.5 rounded-lg
                                                 transition-all duration-200 text-left
                                                 ${isSelected
-                                                    ? 'bg-indigo-500/20 border border-indigo-500/50'
-                                                    : 'hover:bg-slate-700/30 border border-transparent'
+                                                    ? 'bg-pink-100 border border-pink-300'
+                                                    : 'hover:bg-slate-50 border border-transparent'
                                                 }
                                             `}
                                         >
@@ -295,15 +295,15 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                     w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
                                                     transition-all duration-200
                                                     ${isSelected
-                                                        ? 'bg-indigo-500 border-indigo-500'
-                                                        : 'border-slate-500 hover:border-slate-400'
+                                                        ? 'bg-pink-500 border-pink-500'
+                                                        : 'border-slate-300 hover:border-slate-400'
                                                     }
                                                 `}>
                                                     {isSelected && <Check className="w-3 h-3 text-white" />}
                                                 </div>
 
                                                 <GroupIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                                                <span className={`text-sm font-medium truncate ${isSelected ? 'text-indigo-300' : 'text-slate-300'}`}>
+                                                <span className={`text-sm font-medium truncate ${isSelected ? 'text-pink-700' : 'text-slate-700'}`}>
                                                     {groupName}
                                                 </span>
                                             </div>
@@ -312,8 +312,8 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                 <span className={`
                                                     px-2 py-0.5 rounded-full text-xs font-medium
                                                     ${isSelected
-                                                        ? 'bg-indigo-500/30 text-indigo-300'
-                                                        : 'bg-slate-700/50 text-slate-400'
+                                                        ? 'bg-pink-200 text-pink-700'
+                                                        : 'bg-slate-100 text-slate-500'
                                                     }
                                                 `}>
                                                     {groupApis.length}
@@ -322,7 +322,7 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                 {/* 展開ボタン */}
                                                 <button
                                                     onClick={(e) => toggleExpand(groupName, e)}
-                                                    className="p-1 rounded hover:bg-slate-600/50 text-slate-500 hover:text-slate-300 transition-colors"
+                                                    className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                                                     title="詳細を表示"
                                                 >
                                                     {isExpanded ? (
@@ -340,14 +340,14 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                                 {groupApis.slice(0, 5).map((api) => (
                                                     <div
                                                         key={api.id}
-                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-400"
+                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-500"
                                                     >
-                                                        <Folder className="w-3.5 h-3.5 text-slate-500" />
+                                                        <Folder className="w-3.5 h-3.5 text-slate-400" />
                                                         <span className="truncate">{api.name}</span>
                                                     </div>
                                                 ))}
                                                 {groupApis.length > 5 && (
-                                                    <div className="px-3 py-1 text-xs text-slate-500 italic">
+                                                    <div className="px-3 py-1 text-xs text-slate-400 italic">
                                                         他 {groupApis.length - 5} 件...
                                                     </div>
                                                 )}
@@ -361,15 +361,15 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                 </div>
 
                 {/* フッター統計 */}
-                <div className="p-4 border-t border-slate-700/50 bg-slate-800/30">
+                <div className="p-4 border-t border-pink-100 bg-white/50">
                     <div className="grid grid-cols-2 gap-2 text-center">
-                        <div className="p-2 rounded-lg bg-slate-700/20">
-                            <div className="text-lg font-bold text-white">{apis.length}</div>
-                            <div className="text-xs text-slate-500">総API数</div>
+                        <div className="p-2 rounded-lg bg-sky-50 border border-sky-100">
+                            <div className="text-lg font-bold text-sky-700">{apis.length}</div>
+                            <div className="text-xs text-sky-500">総API数</div>
                         </div>
-                        <div className="p-2 rounded-lg bg-slate-700/20">
-                            <div className="text-lg font-bold text-indigo-400">{groupedApis.length}</div>
-                            <div className="text-xs text-slate-500">グループ数</div>
+                        <div className="p-2 rounded-lg bg-pink-50 border border-pink-100">
+                            <div className="text-lg font-bold text-pink-700">{groupedApis.length}</div>
+                            <div className="text-xs text-pink-500">グループ数</div>
                         </div>
                     </div>
                 </div>

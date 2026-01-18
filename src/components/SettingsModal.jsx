@@ -79,23 +79,23 @@ export default function SettingsModal({ isOpen, onClose }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/30 backdrop-blur-sm"
                 onClick={onClose}
             ></div>
 
             {/* Modal */}
-            <div className="relative glass rounded-2xl p-6 max-w-lg w-full animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="relative bg-white rounded-2xl p-6 max-w-lg w-full animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto border border-pink-100">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                            <Key className="w-5 h-5 text-indigo-400" />
+                        <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center">
+                            <Key className="w-5 h-5 text-pink-500" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">設定</h2>
+                        <h2 className="text-xl font-bold text-slate-800">設定</h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -105,7 +105,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                 <div className="space-y-6">
                     {/* API Key Section */}
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                             Gemini API キー
                         </label>
                         <div className="relative">
@@ -114,11 +114,11 @@ export default function SettingsModal({ isOpen, onClose }) {
                                 value={apiKey}
                                 onChange={handleApiKeyChange}
                                 placeholder="AIzaSy..."
-                                className="w-full input-dark px-4 py-3 pr-12 rounded-xl text-white"
+                                className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                             />
                             <button
                                 onClick={() => setShowKey(!showKey)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
                             >
                                 {showKey ? (
                                     <EyeOff className="w-5 h-5" />
@@ -127,7 +127,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                                 )}
                             </button>
                         </div>
-                        <p className="mt-2 text-xs text-slate-500">
+                        <p className="mt-2 text-xs text-slate-400">
                             APIキーはブラウザのローカルストレージに保存されます
                         </p>
                     </div>
@@ -135,14 +135,14 @@ export default function SettingsModal({ isOpen, onClose }) {
                     {/* Model Selection Section */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2">
-                                <Cpu className="w-4 h-4 text-indigo-400" />
+                            <label className="block text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Cpu className="w-4 h-4 text-violet-500" />
                                 AIモデル
                             </label>
                             <button
                                 onClick={handleLoadModelsClick}
                                 disabled={!apiKey.trim() || isLoadingModels}
-                                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 disabled:opacity-50 transition-colors"
+                                className="text-xs text-pink-500 hover:text-pink-600 flex items-center gap-1 disabled:opacity-50 transition-colors"
                             >
                                 {isLoadingModels ? (
                                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -155,7 +155,7 @@ export default function SettingsModal({ isOpen, onClose }) {
 
                         {/* Model Error */}
                         {modelError && (
-                            <div className="mb-2 p-2 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center gap-2 text-xs text-rose-300">
+                            <div className="mb-2 p-2 rounded-lg bg-rose-50 border border-rose-200 flex items-center gap-2 text-xs text-rose-600">
                                 <AlertCircle className="w-4 h-4" />
                                 {modelError}
                             </div>
@@ -166,7 +166,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                             <select
                                 value={selectedModel}
                                 onChange={(e) => setSelectedModel(e.target.value)}
-                                className="w-full input-dark px-4 py-3 rounded-xl text-white"
+                                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                             >
                                 {availableModels.map((model) => (
                                     <option key={model.name} value={model.name}>
@@ -179,20 +179,20 @@ export default function SettingsModal({ isOpen, onClose }) {
                                 type="text"
                                 value={selectedModel}
                                 onChange={(e) => setSelectedModel(e.target.value)}
-                                placeholder="gemini-2.5-flash-preview-05-20"
-                                className="w-full input-dark px-4 py-3 rounded-xl text-white"
+                                placeholder="gemini-3-flash-preview"
+                                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                             />
                         )}
 
                         {/* Current Model Info */}
                         {availableModels.length > 0 && selectedModel && (
-                            <div className="mt-2 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                            <div className="mt-2 p-3 rounded-lg bg-violet-50 border border-violet-200">
                                 {(() => {
                                     const model = availableModels.find((m) => m.name === selectedModel);
                                     if (!model) return null;
                                     return (
                                         <div className="space-y-1">
-                                            <p className="text-xs text-slate-400">{model.description}</p>
+                                            <p className="text-xs text-slate-600">{model.description}</p>
                                             <div className="flex gap-4 text-xs text-slate-500">
                                                 {model.inputTokenLimit && (
                                                     <span>入力: {model.inputTokenLimit.toLocaleString()} トークン</span>
@@ -207,7 +207,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                             </div>
                         )}
 
-                        <p className="mt-2 text-xs text-slate-500">
+                        <p className="mt-2 text-xs text-slate-400">
                             使用するGemini AIモデルを選択します
                         </p>
                     </div>
@@ -217,17 +217,17 @@ export default function SettingsModal({ isOpen, onClose }) {
                         href="https://aistudio.google.com/app/apikey"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                        className="flex items-center gap-2 text-sm text-pink-500 hover:text-pink-600 transition-colors"
                     >
                         <span>Google AI StudioでAPIキーを取得</span>
                         <ExternalLink className="w-4 h-4" />
                     </a>
 
                     {/* Actions */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-700/50">
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                         <button
                             onClick={onClose}
-                            className="px-4 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                            className="px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors"
                         >
                             キャンセル
                         </button>

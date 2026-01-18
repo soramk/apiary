@@ -75,7 +75,7 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
 
     return (
         <>
-            <header className="glass sticky top-0 z-50 border-b border-pink-300/20">
+            <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-pink-100 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo Text */}
@@ -84,27 +84,27 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                         </div>
 
                         {/* Local DB Badge */}
-                        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30">
+                        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
                             <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
-                            <span className="text-xs text-amber-300 font-medium">Local DB</span>
+                            <span className="text-xs text-amber-700 font-medium">Local DB</span>
                         </div>
 
                         {/* Menu Button */}
                         <div className="relative">
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
+                                className="p-2 rounded-lg hover:bg-pink-50 transition-colors"
                             >
                                 {isMenuOpen ? (
-                                    <X className="w-6 h-6 text-slate-300" />
+                                    <X className="w-6 h-6 text-slate-600" />
                                 ) : (
-                                    <Menu className="w-6 h-6 text-slate-300" />
+                                    <Menu className="w-6 h-6 text-slate-600" />
                                 )}
                             </button>
 
                             {/* Dropdown Menu */}
                             {isMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-64 glass rounded-xl shadow-xl border border-slate-600/50 overflow-hidden animate-fade-in">
+                                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-pink-100 overflow-hidden animate-fade-in">
                                     <div className="p-2">
                                         <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                             エクスポート
@@ -112,46 +112,46 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                                         <button
                                             onClick={() => handleExport('json')}
                                             disabled={isExporting}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-amber-50 transition-colors text-left"
                                         >
-                                            <FileJson className="w-5 h-5 text-amber-400" />
+                                            <FileJson className="w-5 h-5 text-amber-500" />
                                             <div>
-                                                <div className="text-sm text-slate-200">JSON形式</div>
+                                                <div className="text-sm text-slate-700">JSON形式</div>
                                                 <div className="text-xs text-slate-400">完全なバックアップ</div>
                                             </div>
                                         </button>
                                         <button
                                             onClick={() => handleExport('csv')}
                                             disabled={isExporting}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-emerald-50 transition-colors text-left"
                                         >
-                                            <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+                                            <FileSpreadsheet className="w-5 h-5 text-emerald-500" />
                                             <div>
-                                                <div className="text-sm text-slate-200">CSV形式</div>
+                                                <div className="text-sm text-slate-700">CSV形式</div>
                                                 <div className="text-xs text-slate-400">スプレッドシート用</div>
                                             </div>
                                         </button>
                                         <button
                                             onClick={() => handleExport('markdown')}
                                             disabled={isExporting}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-50 transition-colors text-left"
                                         >
-                                            <FileText className="w-5 h-5 text-blue-400" />
+                                            <FileText className="w-5 h-5 text-sky-500" />
                                             <div>
-                                                <div className="text-sm text-slate-200">Markdown形式</div>
+                                                <div className="text-sm text-slate-700">Markdown形式</div>
                                                 <div className="text-xs text-slate-400">ドキュメント用</div>
                                             </div>
                                         </button>
 
-                                        <div className="my-2 border-t border-slate-600/50"></div>
+                                        <div className="my-2 border-t border-slate-100"></div>
 
                                         <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                             インポート
                                         </div>
-                                        <label className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
-                                            <Upload className="w-5 h-5 text-indigo-400" />
+                                        <label className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-violet-50 transition-colors cursor-pointer">
+                                            <Upload className="w-5 h-5 text-violet-500" />
                                             <div>
-                                                <div className="text-sm text-slate-200">JSONインポート</div>
+                                                <div className="text-sm text-slate-700">JSONインポート</div>
                                                 <div className="text-xs text-slate-400">バックアップを復元</div>
                                             </div>
                                             <input
@@ -162,18 +162,18 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                                             />
                                         </label>
 
-                                        <div className="my-2 border-t border-slate-600/50"></div>
+                                        <div className="my-2 border-t border-slate-100"></div>
 
                                         <button
                                             onClick={() => {
                                                 setIsMenuOpen(false);
                                                 onOpenHistory?.();
                                             }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-fuchsia-50 transition-colors text-left"
                                         >
-                                            <History className="w-5 h-5 text-violet-400" />
+                                            <History className="w-5 h-5 text-fuchsia-500" />
                                             <div>
-                                                <div className="text-sm text-slate-200">検索履歴</div>
+                                                <div className="text-sm text-slate-700">検索履歴</div>
                                                 <div className="text-xs text-slate-400">過去の検索を確認</div>
                                             </div>
                                         </button>
