@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveSearchHistory } from './history';
 
 const API_TIMEOUT = 60000; // 60秒
-const DEFAULT_MODEL = 'gemini-2.5-flash-preview-05-20';
+const DEFAULT_MODEL = 'gemini-3-flash-preview';
 const MODEL_STORAGE_KEY = 'gemini_model_name';
 
 /**
@@ -521,7 +521,7 @@ API情報:
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: {
@@ -600,7 +600,7 @@ JSONのみを返してください。`;
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: {
