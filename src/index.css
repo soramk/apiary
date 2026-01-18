@@ -9,82 +9,87 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(241, 245, 249, 0.5);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #a78bfa 0%, #f9a8d4 100%);
+    background: linear-gradient(135deg, #f9a8d4 0%, #7dd3fc 100%);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #c4b5fd 0%, #fbcfe8 100%);
+    background: linear-gradient(135deg, #fbcfe8 0%, #a5f3fc 100%);
 }
 
-/* グローバルスタイル - ロゴに合わせたソフトなパステルカラー */
+/* グローバルスタイル - 明るいパステルカラー */
 body {
-    background: linear-gradient(135deg, #0c1929 0%, #1a2744 50%, #1e3a5f 100%);
+    background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 50%, #fef3c7 100%);
     min-height: 100vh;
-    color: #f1f5f9;
+    color: #1e293b;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* グラスモーフィズム効果 - ブルー/ピンクのアクセント */
+/* グラスモーフィズム効果 - 明るい版 */
 .glass {
-    background: rgba(30, 45, 70, 0.6);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(167, 139, 250, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .glass-card {
-    background: rgba(30, 45, 70, 0.5);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(249, 168, 212, 0.2);
+    border: 1px solid rgba(249, 168, 212, 0.3);
     transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-    background: rgba(40, 55, 85, 0.7);
-    border-color: rgba(249, 168, 212, 0.4);
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(249, 168, 212, 0.5);
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px -15px rgba(249, 168, 212, 0.3);
+    box-shadow: 0 20px 40px -15px rgba(249, 168, 212, 0.4);
 }
 
 /* グラデーションテキスト - ロゴカラーに合わせる */
 .gradient-text {
-    background: linear-gradient(135deg, #7dd3fc 0%, #f9a8d4 50%, #fcd34d 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #ec4899 50%, #f59e0b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-/* ボタンスタイル - ソフトなピンク/アンバーグラデーション */
+/* ボタンスタイル - ピンク/アンバーグラデーション */
 .btn-primary {
     background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px -3px rgba(236, 72, 153, 0.5);
+    box-shadow: 0 4px 15px -3px rgba(236, 72, 153, 0.4);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.6);
+    box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.5);
 }
 
 .btn-primary:active {
     transform: translateY(0);
 }
 
-/* 入力フィールドスタイル */
+/* 入力フィールドスタイル - 明るい版 */
 .input-dark {
-    background: rgba(15, 30, 50, 0.8);
-    border: 1px solid rgba(167, 139, 250, 0.3);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(249, 168, 212, 0.4);
     transition: all 0.3s ease;
+    color: #1e293b;
+}
+
+.input-dark::placeholder {
+    color: #94a3b8;
 }
 
 .input-dark:focus {
-    border-color: #f9a8d4;
-    box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.2);
+    border-color: #f472b6;
+    box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
     outline: none;
 }
 
@@ -92,8 +97,8 @@ body {
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #f9a8d4;
+    border: 2px solid rgba(236, 72, 153, 0.3);
+    border-top-color: #ec4899;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -106,12 +111,13 @@ body {
 
 /* コードブロックスタイル */
 .code-block {
-    background: #0d1929;
-    border: 1px solid rgba(167, 139, 250, 0.3);
+    background: #1e293b;
+    border: 1px solid rgba(148, 163, 184, 0.3);
     border-radius: 8px;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     font-size: 0.875rem;
     line-height: 1.5;
+    color: #f1f5f9;
 }
 
 /* ステータスインジケータ */
@@ -146,19 +152,19 @@ body {
 
 /* タブスタイル */
 .tab-active {
-    background: rgba(249, 168, 212, 0.2);
-    border-bottom: 2px solid #f9a8d4;
-    color: #fbcfe8;
+    background: rgba(236, 72, 153, 0.15);
+    border-bottom: 2px solid #ec4899;
+    color: #be185d;
 }
 
 .tab-inactive {
-    color: #94a3b8;
+    color: #64748b;
     border-bottom: 2px solid transparent;
 }
 
 .tab-inactive:hover {
-    color: #cbd5e1;
-    background: rgba(167, 139, 250, 0.2);
+    color: #334155;
+    background: rgba(249, 168, 212, 0.1);
 }
 
 /* サイドバースタイル */
@@ -206,12 +212,12 @@ aside::-webkit-scrollbar-track {
 }
 
 aside::-webkit-scrollbar-thumb {
-    background: rgba(249, 168, 212, 0.4);
+    background: rgba(236, 72, 153, 0.3);
     border-radius: 2px;
 }
 
 aside::-webkit-scrollbar-thumb:hover {
-    background: rgba(249, 168, 212, 0.6);
+    background: rgba(236, 72, 153, 0.5);
 }
 
 /* 右からのスライドインアニメーション */
@@ -248,20 +254,19 @@ aside::-webkit-scrollbar-thumb:hover {
     }
 }
 
-/* 蜂のアクセントカラー */
-.bee-accent {
-    color: #fcd34d;
+/* テキストカラーのオーバーライド（明るい背景用） */
+.text-white {
+    color: #1e293b !important;
 }
 
-.bee-glow {
-    box-shadow: 0 0 20px rgba(252, 211, 77, 0.3);
+/* カード内のテキスト */
+.glass-card .text-white,
+.glass-card h3,
+.glass-card h4 {
+    color: #1e293b;
 }
 
-/* 花のアクセントカラー */
-.flower-accent {
-    color: #f9a8d4;
-}
-
-.flower-glow {
-    box-shadow: 0 0 20px rgba(249, 168, 212, 0.3);
+.glass-card .text-slate-300,
+.glass-card .text-slate-400 {
+    color: #64748b;
 }

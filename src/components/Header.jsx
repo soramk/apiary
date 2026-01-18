@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Database, Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText, History } from 'lucide-react';
+import { Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText, History } from 'lucide-react';
 import { exportToJson, exportToCsv, exportToMarkdown, importFromJson } from '../services/database';
-import apiaryLogo from '../assets/apiary_logo.png';
+
 
 export default function Header({ onImportComplete, onOpenSettings, onOpenHistory }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -78,13 +78,9 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
             <header className="glass sticky top-0 z-50 border-b border-pink-300/20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
-                        {/* Logo */}
+                        {/* Logo Text */}
                         <div className="flex items-center gap-2">
-                            <img
-                                src={apiaryLogo}
-                                alt="Apiary"
-                                className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
-                            />
+                            <h1 className="text-xl font-bold gradient-text">Apiary</h1>
                         </div>
 
                         {/* Local DB Badge */}

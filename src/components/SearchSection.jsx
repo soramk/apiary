@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Sparkles, Loader2, Link2 } from 'lucide-react';
+import apiaryLogo from '../assets/apiary_logo.png';
 
 export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) {
     const [keyword, setKeyword] = useState('');
@@ -12,22 +13,26 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
     };
 
     return (
-        <section className="relative py-16 lg:py-24 overflow-hidden">
-            {/* Background Effects - ロゴカラーに合わせる */}
+        <section className="relative py-12 lg:py-20 overflow-hidden">
+            {/* Background Effects - 明るいグラデーション */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-400/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-pink-200/30 via-sky-200/20 to-transparent rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-tl from-amber-200/30 via-pink-200/20 to-transparent rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-sky-200/20 rounded-full blur-3xl"></div>
             </div>
 
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                {/* Logo Image */}
+                <div className="mb-6 animate-fade-in">
+                    <img
+                        src={apiaryLogo}
+                        alt="Apiary"
+                        className="mx-auto h-32 sm:h-40 lg:h-48 w-auto object-contain drop-shadow-lg"
+                    />
+                </div>
+
                 {/* Hero Text */}
                 <div className="mb-8 animate-fade-in">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-500/10 border border-pink-400/30 mb-6">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
-                        <span className="text-sm text-pink-300">Powered by Gemini AI</span>
-                    </div>
-
                     <h2 className="text-4xl lg:text-5xl font-bold mb-4">
                         <span className="gradient-text">Discover APIs</span>
                         <br />
