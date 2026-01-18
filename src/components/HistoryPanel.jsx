@@ -15,7 +15,12 @@ import {
     ShieldCheck,
     ListFilter,
     FileCode,
-    Link2
+    Link2,
+    Download,
+    Trash2,
+    ChevronDown,
+    ChevronRight,
+    FileJson
 } from 'lucide-react';
 import {
     getAllHistory,

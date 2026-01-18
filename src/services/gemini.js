@@ -547,6 +547,9 @@ ${authInstruction}
         error: null
     };
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
     try {
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${getModelName()}:generateContent?key=${apiKey}`,
@@ -669,6 +672,9 @@ JSONのみを返してください。`;
         success: false,
         error: null
     };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     try {
         const response = await fetch(
