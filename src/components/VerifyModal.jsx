@@ -9,7 +9,8 @@ import {
     AlertTriangle,
     ArrowRight,
     RefreshCw,
-    Save
+    Save,
+    Sparkles
 } from 'lucide-react';
 import { verifyApiInfo } from '../services/gemini';
 
@@ -285,10 +286,15 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                         <button
                             onClick={handleVerify}
                             disabled={isVerifying}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors disabled:opacity-50 group"
+                            title="AI（トークン）を使用して再度情報を検証します"
                         >
-                            <RefreshCw className={`w-4 h-4 ${isVerifying ? 'animate-spin' : ''}`} />
-                            再検証
+                            {isVerifying ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Sparkles className="w-4 h-4 text-violet-500 group-hover:animate-pulse" />
+                            )}
+                            AI再検証
                         </button>
                         <div className="flex items-center gap-3">
                             <button

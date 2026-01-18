@@ -155,7 +155,8 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                 <button
                                     onClick={handleAnalyze}
                                     disabled={!url.trim() || isLoading}
-                                    className="btn-primary px-6 py-3 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="btn-primary px-6 py-3 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
+                                    title="AI（トークン）を使用してURLを分析します"
                                 >
                                     {isLoading ? (
                                         <>
@@ -164,8 +165,8 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                         </>
                                     ) : (
                                         <>
-                                            <Sparkles className="w-5 h-5" />
-                                            <span>分析</span>
+                                            <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
+                                            <span>AI分析</span>
                                         </>
                                     )}
                                 </button>

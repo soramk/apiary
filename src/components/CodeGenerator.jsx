@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Code2, Copy, Check, Loader2 } from 'lucide-react';
+import { Code2, Copy, Check, Loader2, Sparkles } from 'lucide-react';
 import { generateCode } from '../services/gemini';
 
 export default function CodeGenerator({ api }) {
@@ -68,7 +68,8 @@ export default function CodeGenerator({ api }) {
             <button
                 onClick={handleGenerate}
                 disabled={isLoading}
-                className="btn-primary px-6 py-3 rounded-xl text-white font-medium flex items-center gap-2 disabled:opacity-50"
+                className="btn-primary px-6 py-3 rounded-xl text-white font-medium flex items-center gap-2 disabled:opacity-50 group"
+                title="AI（トークン）を使用してサンプルコードを生成します"
             >
                 {isLoading ? (
                     <>
@@ -77,7 +78,7 @@ export default function CodeGenerator({ api }) {
                     </>
                 ) : (
                     <>
-                        <Code2 className="w-5 h-5" />
+                        <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
                         コードを生成
                     </>
                 )}

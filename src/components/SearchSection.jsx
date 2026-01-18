@@ -84,7 +84,8 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                                 <button
                                     type="submit"
                                     disabled={!keyword.trim() || isLoading}
-                                    className="btn-primary px-6 py-4 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="btn-primary px-6 py-4 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group relative"
+                                    title="AI（トークン）を使用してAPIを検索します"
                                 >
                                     {isLoading ? (
                                         <>
@@ -93,7 +94,7 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                                         </>
                                     ) : (
                                         <>
-                                            <Sparkles className="w-5 h-5" />
+                                            <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
                                             <span className="hidden sm:inline">AIで検索</span>
                                         </>
                                     )}

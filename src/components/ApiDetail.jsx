@@ -18,7 +18,8 @@ import {
     X,
     BookOpen,
     Target,
-    XCircle
+    XCircle,
+    Sparkles
 } from 'lucide-react';
 import { checkApiStatus } from '../services/gemini';
 import { saveApi } from '../services/database';
@@ -204,25 +205,26 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                             {/* AI再検証ボタン */}
                             <button
                                 onClick={() => setShowVerifyModal(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-colors"
-                                title="AIで情報を再検証"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-colors group"
+                                title="AI（トークン）を使用して情報を再検証します"
                             >
-                                <ShieldCheck className="w-4 h-4" />
-                                <span className="hidden sm:inline">再検証</span>
+                                <Sparkles className="w-4 h-4 text-violet-500 group-hover:animate-pulse" />
+                                <span className="hidden sm:inline">AI再検証</span>
                             </button>
 
                             {/* ステータス確認ボタン */}
                             <button
                                 onClick={handleCheckStatus}
                                 disabled={isChecking}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 bg-white/50 hover:bg-white border border-slate-200 transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 bg-white/50 hover:bg-white border border-slate-200 transition-colors disabled:opacity-50 group"
+                                title="AI（トークン）を使用して最新ステータスを確認します"
                             >
                                 {isChecking ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
-                                    <RefreshCw className="w-4 h-4" />
+                                    <Sparkles className="w-4 h-4 text-pink-400 group-hover:animate-pulse" />
                                 )}
-                                <span className="hidden sm:inline">ステータス</span>
+                                <span className="hidden sm:inline">AIステータス</span>
                             </button>
 
                             {/* 公式サイトリンク */}
