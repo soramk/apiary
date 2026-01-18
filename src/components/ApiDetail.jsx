@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     ArrowLeft,
     ExternalLink,
@@ -35,6 +35,11 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
     const [newTag, setNewTag] = useState('');
+
+    // 詳細を開いたときに常に最上部にスクロールする
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [api?.id]);
 
     const tabs = [
         { id: 'overview', label: 'Overview', icon: BookOpen },
