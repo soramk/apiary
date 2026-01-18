@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { saveSearchHistory } from './history';
 
-const API_TIMEOUT = 60000; // 60秒
+const API_TIMEOUT = 180000; // 180秒 (3分)
 const DEFAULT_MODEL = 'gemini-3-flash-preview';
 const MODEL_STORAGE_KEY = 'gemini_model_name';
 
@@ -521,11 +521,12 @@ API情報:
 ${authInstruction}
 3. ネットワークエラー、タイムアウト、ステータスコードに応じた詳細なエラーハンドリングを含めること。
 4. レスポンスデータ（JSON等）を適切にパースし、利用しやすい形で出力または返却すること。
-5. TypeScriptの場合はインターフェース等の型定義を正確に行い、Excel VBAの場合はWinHttpオブジェクトの適切な参照と解放を行うこと。
+5. TypeScriptの場合はインターフェース等の型定義を正確に行い、Excel VBAの場合はユーザーが参照設定を追加する手間を省くため、CreateObjectを用いた「レイトバインディング（Late Binding）」で実装すること。
+6. VBAにおいて複雑なJSONパーサー自体の実装を含めるとトークン制限を越えるため、リクエストとレスポンスの取得、および基本的なプロパティへのアクセスロジックに集中すること。
 
 自己検証・再帰的確認:
 出力前に以下のチェックを必ず実行してください：
-- このコードは依存関係が解決されていればそのまま実行可能か？
+- このコードは依存関係（ライブラリ参照設定等）なしで、そのまま標準モジュールに貼り付けて実行可能か？
 - APIのベースURLとエンドポイントの結合ロジックに誤りはないか？
 - エラーハンドリングは単なるログ出力に留まらず、実用的な実装になっているか？
 
@@ -566,7 +567,7 @@ ${authInstruction}
                     ],
                     generationConfig: {
                         temperature: 0.3,
-                        maxOutputTokens: 2048,
+                        maxOutputTokens: 40960,
                     }
                 }),
                 signal: controller.signal
@@ -603,9 +604,12 @@ ${authInstruction}
             throw new Error('AIからの応答が空でした');
         }
 
-        // コードブロックを抽出
-        const codeMatch = text.match(/```[\w]*\n?([\s\S]*?)```/);
-        const result = codeMatch ? codeMatch[1].trim() : text.trim();
+        // コードブロックを抽出（閉じタグがなくても可能な限り抽出）
+        let result = text;
+        const codeMatch = text.match(/```[\w]*\n?([\s\S]*?)(?:```|$)/);
+        if (codeMatch && codeMatch[1]) {
+            result = codeMatch[1].trim();
+        }
 
         historyEntry.response = text;
         historyEntry.tokenUsage = tokenUsage;
