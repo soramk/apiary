@@ -78,11 +78,12 @@ export default function Header({ onImportComplete, onOpenSettings, onOpenHistory
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <img
                                 src="/apiary_logo.png"
-                                alt="Apiary Logo"
-                                className="h-12 w-auto object-contain"
+                                alt="Apiary"
+                                className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
+                                loading="eager"
                             />
                         </div>
 
