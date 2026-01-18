@@ -289,7 +289,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                         {/* Tabs */}
                         <div className="flex gap-1 p-1 mb-6 bg-slate-200/50 rounded-xl border border-slate-200">
                             {tabs.map((tab) => {

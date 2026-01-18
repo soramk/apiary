@@ -180,7 +180,7 @@ export default function Playground({ api }) {
 
             {/* Response */}
             {(response || error) && (
-                <div className="space-y-3">
+                <div className="space-y-3 w-full overflow-hidden">
                     <h4 className="text-sm font-medium text-slate-700">レスポンス</h4>
 
                     {error ? (
