@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { Database, Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText } from 'lucide-react';
 import { exportToJson, exportToCsv, exportToMarkdown, importFromJson } from '../services/database';
 
-export default function Header({ onImportComplete }) {
+export default function Header({ onImportComplete, onOpenSettings }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
-    const [showImportModal, setShowImportModal] = useState(false);
     const [importStatus, setImportStatus] = useState(null);
 
     const handleExport = async (format) => {
@@ -173,7 +172,7 @@ export default function Header({ onImportComplete }) {
                                         <button
                                             onClick={() => {
                                                 setIsMenuOpen(false);
-                                                setShowImportModal(true);
+                                                onOpenSettings?.();
                                             }}
                                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
                                         >
