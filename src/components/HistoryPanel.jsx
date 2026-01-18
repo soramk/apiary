@@ -239,7 +239,7 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                         </div>
                                         <div className="p-4 rounded-xl bg-pink-50 border border-pink-200">
                                             <div className="text-2xl font-bold text-pink-600">{stats.totalApisFound}</div>
-                                            <div className="text-xs text-slate-500">発見したAPI</div>
+                                            <div className="text-xs text-slate-600">発見したAPI</div>
                                         </div>
                                     </div>
 
@@ -256,7 +256,7 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                             </div>
                                             <div>
                                                 <div className="text-lg font-bold text-slate-800">{stats.totalTokensUsed.toLocaleString()}</div>
-                                                <div className="text-xs text-slate-500">総トークン使用量</div>
+                                                <div className="text-xs text-slate-600">総トークン使用量</div>
                                             </div>
                                         </div>
                                     </div>
@@ -303,7 +303,7 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                         {f === 'failed' && '失敗のみ'}
                                     </button>
                                 ))}
-                                <span className="ml-auto text-sm text-slate-500">
+                                <span className="ml-auto text-sm text-slate-600">
                                     {filteredHistory.length}件
                                 </span>
                             </div>
@@ -397,13 +397,13 @@ export default function HistoryPanel({ isOpen, onClose }) {
                                                             {entry.tokenUsage && (
                                                                 <>
                                                                     <div className="p-2 rounded-lg bg-white border border-slate-200">
-                                                                        <div className="text-xs text-slate-400 mb-1">入力トークン</div>
+                                                                        <div className="text-xs text-slate-500 mb-1">入力トークン</div>
                                                                         <div className="text-slate-700">
                                                                             {entry.tokenUsage.promptTokens?.toLocaleString() || '-'}
                                                                         </div>
                                                                     </div>
                                                                     <div className="p-2 rounded-lg bg-white border border-slate-200">
-                                                                        <div className="text-xs text-slate-400 mb-1">出力トークン</div>
+                                                                        <div className="text-xs text-slate-500 mb-1">出力トークン</div>
                                                                         <div className="text-slate-700">
                                                                             {entry.tokenUsage.completionTokens?.toLocaleString() || '-'}
                                                                         </div>

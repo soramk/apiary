@@ -102,11 +102,11 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
     return (
         <div className="min-h-screen animate-fade-in">
             {/* Header */}
-            <div className="glass sticky top-0 z-40 border-b border-slate-700/50">
+            <div className="glass sticky top-0 z-40 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <button
                         onClick={onBack}
-                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
+                        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         <span>一覧に戻る</span>
@@ -115,7 +115,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <h1 className="text-2xl font-bold text-white">{api.name}</h1>
+                                <h1 className="text-2xl font-bold text-slate-800">{api.name}</h1>
                                 <span className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
                                     {api.category}
                                 </span>
@@ -124,7 +124,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                     <span>{statusConfig.label}</span>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-slate-400">
+                            <div className="flex items-center gap-1.5 text-slate-600">
                                 <Building2 className="w-4 h-4" />
                                 <span>{api.provider}</span>
                             </div>
@@ -134,7 +134,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                             {/* 編集ボタン */}
                             <button
                                 onClick={() => setShowEditModal(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 bg-white/50 hover:bg-white border border-slate-200 transition-colors"
                                 title="情報を編集"
                             >
                                 <Edit3 className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                             <button
                                 onClick={handleCheckStatus}
                                 disabled={isChecking}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 bg-white/50 hover:bg-white border border-slate-200 transition-colors disabled:opacity-50"
                             >
                                 {isChecking ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -231,7 +231,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                     {/* Left Content */}
                     <div className="flex-1">
                         {/* Tabs */}
-                        <div className="flex gap-1 p-1 mb-6 bg-slate-800/50 rounded-xl">
+                        <div className="flex gap-1 p-1 mb-6 bg-slate-200/50 rounded-xl border border-slate-200">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 return (
@@ -240,7 +240,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${activeTab === tab.id
                                             ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                            : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
                                             }`}
                                     >
                                         <Icon className="w-4 h-4" />
@@ -256,8 +256,8 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                 <div className="space-y-6 animate-fade-in">
                                     {/* Description */}
                                     <div>
-                                        <h3 className="text-lg font-semibold text-white mb-3">概要</h3>
-                                        <p className="text-slate-300 leading-relaxed">
+                                        <h3 className="text-lg font-semibold text-slate-800 mb-3">概要</h3>
+                                        <p className="text-slate-600 leading-relaxed">
                                             {api.longDescription || api.description}
                                         </p>
                                     </div>
@@ -265,12 +265,12 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                     {/* Use Cases */}
                                     {api.useCases && api.useCases.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white mb-3">主なユースケース</h3>
+                                            <h3 className="text-lg font-semibold text-slate-800 mb-3">主なユースケース</h3>
                                             <ul className="space-y-2">
                                                 {api.useCases.map((useCase, index) => (
                                                     <li
                                                         key={index}
-                                                        className="flex items-start gap-3 text-slate-300"
+                                                        className="flex items-start gap-3 text-slate-600"
                                                     >
                                                         <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-sm flex-shrink-0">
                                                             {index + 1}
@@ -285,7 +285,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                     {/* Endpoint Example */}
                                     {api.endpointExample && (
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white mb-3">
+                                            <h3 className="text-lg font-semibold text-slate-800 mb-3">
                                                 エンドポイント例
                                             </h3>
                                             <div className="code-block p-4">
@@ -297,7 +297,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                     {/* Response Example */}
                                     {api.responseExample && (
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white mb-3">
+                                            <h3 className="text-lg font-semibold text-slate-800 mb-3">
                                                 レスポンス例
                                             </h3>
                                             <div className="code-block p-4 overflow-x-auto">
@@ -327,36 +327,36 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                     {/* Sidebar */}
                     <div className="lg:w-80">
                         <div className="glass-card rounded-2xl p-6 sticky top-32">
-                            <h3 className="text-lg font-semibold text-white mb-4">メタデータ</h3>
+                            <h3 className="text-lg font-semibold text-slate-800 mb-4">メタデータ</h3>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
-                                    <div className="flex items-center gap-2 text-slate-400">
+                                <div className="flex items-center justify-between py-3 border-b border-slate-200">
+                                    <div className="flex items-center gap-2 text-slate-500">
                                         <Key className="w-4 h-4" />
                                         <span className="text-sm">認証方式</span>
                                     </div>
-                                    <span className="text-white font-medium">{api.authType}</span>
+                                    <span className="text-slate-800 font-medium">{api.authType}</span>
                                 </div>
 
-                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
-                                    <div className="flex items-center gap-2 text-slate-400">
+                                <div className="flex items-center justify-between py-3 border-b border-slate-200">
+                                    <div className="flex items-center gap-2 text-slate-500">
                                         <DollarSign className="w-4 h-4" />
                                         <span className="text-sm">料金</span>
                                     </div>
-                                    <span className="text-white font-medium">{api.pricing}</span>
+                                    <span className="text-slate-800 font-medium">{api.pricing}</span>
                                 </div>
 
-                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
-                                    <div className="flex items-center gap-2 text-slate-400">
+                                <div className="flex items-center justify-between py-3 border-b border-slate-200">
+                                    <div className="flex items-center gap-2 text-slate-500">
                                         <Building2 className="w-4 h-4" />
                                         <span className="text-sm">提供元</span>
                                     </div>
-                                    <span className="text-white font-medium text-right">{api.provider}</span>
+                                    <span className="text-slate-800 font-medium text-right">{api.provider}</span>
                                 </div>
 
                                 {api.searchKeyword && (
                                     <div className="pt-3">
                                         <p className="text-xs text-slate-500 mb-2">検索キーワード</p>
-                                        <span className="inline-block px-3 py-1 rounded-lg text-sm bg-slate-800/50 text-slate-300">
+                                        <span className="inline-block px-3 py-1 rounded-lg text-sm bg-slate-100 text-slate-600 border border-slate-200">
                                             {api.searchKeyword}
                                         </span>
                                     </div>
@@ -365,7 +365,7 @@ export default function ApiDetail({ api, onBack, onUpdate }) {
                                 {api.lastCheckedAt && (
                                     <div className="pt-3">
                                         <p className="text-xs text-slate-500 mb-2">最終確認日時</p>
-                                        <span className="text-sm text-slate-400">
+                                        <span className="text-sm text-slate-600">
                                             {new Date(api.lastCheckedAt).toLocaleString('ja-JP')}
                                         </span>
                                     </div>

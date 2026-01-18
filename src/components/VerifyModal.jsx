@@ -103,26 +103,26 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
             {/* モーダル */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
                 <div
-                    className="w-full max-w-3xl glass rounded-2xl border border-slate-600/50 shadow-2xl animate-fade-in my-8"
+                    className="w-full max-w-3xl bg-white rounded-2xl border border-pink-100 shadow-2xl animate-fade-in my-8"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* ヘッダー */}
-                    <div className="p-6 border-b border-slate-700/50">
+                    <div className="p-6 border-b border-slate-200">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600">
                                     <ShieldCheck className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-white">AI再検証</h2>
-                                    <p className="text-sm text-slate-400">
+                                    <h2 className="text-xl font-bold text-slate-800">AI再検証</h2>
+                                    <p className="text-sm text-slate-500">
                                         {api.name} の情報を再検証します
                                     </p>
                                 </div>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+                                className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -135,10 +135,10 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                         {!result && !error && !isVerifying && (
                             <div className="text-center py-8">
                                 <ShieldCheck className="w-16 h-16 text-indigo-400 mx-auto mb-4 opacity-50" />
-                                <h3 className="text-lg font-medium text-white mb-2">
+                                <h3 className="text-lg font-medium text-slate-800 mb-2">
                                     API情報の検証を開始
                                 </h3>
-                                <p className="text-slate-400 mb-6 max-w-md mx-auto">
+                                <p className="text-slate-500 mb-6 max-w-md mx-auto">
                                     AIが登録されているAPI情報を検証し、誤った情報があれば修正案を提示します。
                                 </p>
                                 <button
@@ -157,10 +157,10 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                                 <div className="relative inline-block">
                                     <Loader2 className="w-16 h-16 text-indigo-400 animate-spin" />
                                 </div>
-                                <h3 className="text-lg font-medium text-white mt-4 mb-2">
+                                <h3 className="text-lg font-medium text-slate-800 mt-4 mb-2">
                                     検証中...
                                 </h3>
-                                <p className="text-slate-400">
+                                <p className="text-slate-500">
                                     AIがAPI情報を確認しています
                                 </p>
                             </div>
@@ -222,7 +222,7 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                                             {result.corrections.map((correction, index) => (
                                                 <div
                                                     key={index}
-                                                    className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50"
+                                                    className="p-3 rounded-lg bg-slate-50 border border-slate-200"
                                                 >
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <span className="text-xs font-medium text-slate-400 uppercase">
@@ -241,7 +241,7 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                                                         </span>
                                                     </div>
                                                     {correction.reason && (
-                                                        <p className="text-xs text-slate-500 mt-2">
+                                                        <p className="text-xs text-slate-600 mt-2">
                                                             理由: {correction.reason}
                                                         </p>
                                                     )}
@@ -281,7 +281,7 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                     </div>
 
                     {/* フッター */}
-                    <div className="p-6 border-t border-slate-700/50 bg-slate-800/30 flex items-center justify-between">
+                    <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
                         <button
                             onClick={handleVerify}
                             disabled={isVerifying}
@@ -293,7 +293,7 @@ export default function VerifyModal({ api, isOpen, onClose, onApplyCorrections }
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={onClose}
-                                className="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                                className="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-white transition-colors"
                             >
                                 閉じる
                             </button>

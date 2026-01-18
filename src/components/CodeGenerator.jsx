@@ -45,7 +45,7 @@ export default function CodeGenerator({ api }) {
         <div className="space-y-6">
             {/* Language Selection */}
             <div>
-                <label className="block text-sm font-medium text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-slate-700 mb-3">
                     プログラミング言語を選択
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -54,8 +54,8 @@ export default function CodeGenerator({ api }) {
                             key={lang.id}
                             onClick={() => setLanguage(lang.id)}
                             className={`px-4 py-2.5 rounded-xl font-medium transition-all ${language === lang.id
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 border border-slate-200'
                                 }`}
                         >
                             {lang.name}
@@ -94,10 +94,10 @@ export default function CodeGenerator({ api }) {
             {code && (
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium text-slate-300">生成されたコード</h4>
+                        <h4 className="text-sm font-medium text-slate-700">生成されたコード</h4>
                         <button
                             onClick={handleCopy}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-500 hover:text-slate-800 hover:bg-white border border-slate-200 transition-colors"
                         >
                             {copied ? (
                                 <>
@@ -114,8 +114,8 @@ export default function CodeGenerator({ api }) {
                     </div>
 
                     <div className="code-block">
-                        <div className="flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-700">
-                            <span className="text-xs text-slate-400">
+                        <div className="flex items-center justify-between px-4 py-2 bg-slate-100 border-b border-slate-200">
+                            <span className="text-xs text-slate-500">
                                 {languages.find(l => l.id === language)?.name}
                             </span>
                         </div>
@@ -128,9 +128,9 @@ export default function CodeGenerator({ api }) {
 
             {/* Placeholder */}
             {!code && !error && !isLoading && (
-                <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl">
-                    <Code2 className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                    <p className="text-slate-400 text-sm">
+                <div className="text-center py-12 border border-dashed border-slate-300 rounded-xl bg-white/50">
+                    <Code2 className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                    <p className="text-slate-500 text-sm">
                         「コードを生成」をクリックすると、<br />
                         選択した言語のサンプルコードが生成されます
                     </p>

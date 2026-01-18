@@ -70,8 +70,8 @@ export default function Playground({ api }) {
             <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                    <p className="text-amber-200 text-sm font-medium">CORS制限に関する注意</p>
-                    <p className="text-amber-300/70 text-sm mt-1">
+                    <p className="text-amber-800 text-sm font-medium">CORS制限に関する注意</p>
+                    <p className="text-amber-700/80 text-sm mt-1">
                         多くのAPIはCORS制限により、ブラウザから直接リクエストできません。
                         テスト実行時にエラーが発生した場合は、サーバーサイドでのテストをお勧めします。
                     </p>
@@ -85,7 +85,7 @@ export default function Playground({ api }) {
                     <select
                         value={method}
                         onChange={(e) => setMethod(e.target.value)}
-                        className="input-dark px-4 py-3 rounded-xl text-white w-32"
+                        className="bg-white border border-slate-200 px-4 py-3 rounded-xl text-slate-800 w-32 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                     >
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
@@ -98,20 +98,20 @@ export default function Playground({ api }) {
                         value={endpoint}
                         onChange={(e) => setEndpoint(e.target.value)}
                         placeholder="エンドポイント (例: /v1/users)"
-                        className="flex-1 input-dark px-4 py-3 rounded-xl text-white"
+                        className="flex-1 bg-white border border-slate-200 px-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                     />
                 </div>
 
                 {/* Headers */}
                 <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
                         ヘッダー (JSON)
                     </label>
                     <textarea
                         value={headers}
                         onChange={(e) => setHeaders(e.target.value)}
                         rows={4}
-                        className="w-full input-dark px-4 py-3 rounded-xl text-white font-mono text-sm"
+                        className="w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-slate-800 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                         spellCheck={false}
                     />
                 </div>
@@ -119,14 +119,14 @@ export default function Playground({ api }) {
                 {/* Body */}
                 {method !== 'GET' && method !== 'HEAD' && (
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                             リクエストボディ (JSON)
                         </label>
                         <textarea
                             value={body}
                             onChange={(e) => setBody(e.target.value)}
                             rows={6}
-                            className="w-full input-dark px-4 py-3 rounded-xl text-white font-mono text-sm"
+                            className="w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-slate-800 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                             placeholder='{\n  "key": "value"\n}'
                             spellCheck={false}
                         />
@@ -156,7 +156,7 @@ export default function Playground({ api }) {
             {/* Response */}
             {(response || error) && (
                 <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-slate-300">レスポンス</h4>
+                    <h4 className="text-sm font-medium text-slate-700">レスポンス</h4>
 
                     {error ? (
                         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
@@ -172,10 +172,10 @@ export default function Playground({ api }) {
                             <div className="flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-700">
                                 <div className="flex items-center gap-3">
                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${response.status >= 200 && response.status < 300
-                                            ? 'bg-emerald-500/20 text-emerald-400'
-                                            : response.status >= 400
-                                                ? 'bg-rose-500/20 text-rose-400'
-                                                : 'bg-amber-500/20 text-amber-400'
+                                        ? 'bg-emerald-500/20 text-emerald-400'
+                                        : response.status >= 400
+                                            ? 'bg-rose-500/20 text-rose-400'
+                                            : 'bg-amber-500/20 text-amber-400'
                                         }`}>
                                         {response.status} {response.statusText}
                                     </span>

@@ -108,7 +108,7 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
             {/* モーダル */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div
-                    className="w-full max-w-2xl glass rounded-2xl border border-slate-600/50 shadow-2xl animate-fade-in overflow-hidden"
+                    className="w-full max-w-2xl bg-white rounded-2xl border border-pink-100 shadow-2xl animate-fade-in overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* ヘッダー */}
@@ -119,8 +119,8 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                     <Link className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-white">URLからAPI登録</h2>
-                                    <p className="text-sm text-slate-400">APIドキュメントのURLを入力してください</p>
+                                    <h2 className="text-xl font-bold text-slate-800">URLからAPI登録</h2>
+                                    <p className="text-sm text-slate-500">APIドキュメントのURLを入力してください</p>
                                 </div>
                             </div>
                             <button
@@ -148,7 +148,7 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                         onChange={(e) => setUrl(e.target.value)}
                                         onKeyDown={handleKeyDown}
                                         placeholder="https://api.example.com/docs"
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                                         disabled={isLoading}
                                     />
                                 </div>
@@ -198,27 +198,27 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                                 </div>
 
                                 {/* APIプレビュー */}
-                                <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-600/50 space-y-3">
+                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <h3 className="text-lg font-bold text-white">{result.api.name}</h3>
-                                            <p className="text-sm text-slate-400">{result.api.provider}</p>
+                                            <h3 className="text-lg font-bold text-slate-800">{result.api.name}</h3>
+                                            <p className="text-sm text-slate-500">{result.api.provider}</p>
                                         </div>
                                         <span className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
                                             {result.api.category}
                                         </span>
                                     </div>
 
-                                    <p className="text-sm text-slate-300">{result.api.description}</p>
+                                    <p className="text-sm text-slate-600">{result.api.description}</p>
 
                                     <div className="grid grid-cols-2 gap-3 text-sm">
-                                        <div className="p-2 rounded-lg bg-slate-900/50">
+                                        <div className="p-2 rounded-lg bg-white border border-slate-100">
                                             <div className="text-xs text-slate-500 mb-1">認証方式</div>
-                                            <div className="text-slate-300">{result.api.authType}</div>
+                                            <div className="text-slate-700">{result.api.authType}</div>
                                         </div>
-                                        <div className="p-2 rounded-lg bg-slate-900/50">
+                                        <div className="p-2 rounded-lg bg-white border border-slate-100">
                                             <div className="text-xs text-slate-500 mb-1">料金</div>
-                                            <div className="text-slate-300">{result.api.pricing}</div>
+                                            <div className="text-slate-700">{result.api.pricing}</div>
                                         </div>
                                     </div>
 
@@ -245,10 +245,10 @@ export default function UrlImportModal({ isOpen, onClose, onImport }) {
                     </div>
 
                     {/* フッター */}
-                    <div className="p-6 border-t border-slate-700/50 bg-slate-800/30 flex items-center justify-end gap-3">
+                    <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
                         <button
                             onClick={handleClose}
-                            className="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                            className="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-white transition-colors"
                         >
                             キャンセル
                         </button>

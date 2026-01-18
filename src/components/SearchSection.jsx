@@ -56,10 +56,10 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                     <h2 className="text-4xl lg:text-5xl font-bold mb-4">
                         <span className="gradient-text">Discover APIs</span>
                         <br />
-                        <span className="text-white">Bloom Your Ideas</span>
+                        <span className="text-slate-800">Bloom Your Ideas</span>
                     </h2>
 
-                    <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
                         あなたのアイデアを咲かせるAPIを、AIが見つけてきます。<br className="hidden sm:inline" />
                         検索して、収集して、あなただけのコレクションを育てましょう。
                     </p>
