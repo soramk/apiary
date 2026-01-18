@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
 import SearchSection from './components/SearchSection';
@@ -6,7 +6,10 @@ import ApiGrid from './components/ApiGrid';
 import ApiDetail from './components/ApiDetail';
 import ConfirmDialog from './components/ConfirmDialog';
 import SettingsModal from './components/SettingsModal';
-import { initDB, getAllApis, saveApis, deleteApi } from './services/database';
+import Sidebar from './components/Sidebar';
+import HistoryPanel from './components/HistoryPanel';
+import UrlImportModal from './components/UrlImportModal';
+import { initDB, getAllApis, saveApis, saveApi, deleteApi } from './services/database';
 import { searchApis, getApiKey } from './services/gemini';
 
 export default function App() {
@@ -17,6 +20,10 @@ export default function App() {
     const [error, setError] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+    const [showUrlImport, setShowUrlImport] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [filters, setFilters] = useState({});
 
     // Initialize database and load data
     useEffect(() => {
@@ -40,6 +47,20 @@ export default function App() {
 
         loadData();
     }, []);
+
+    // Filter APIs based on selected filters
+    const filteredApis = useMemo(() => {
+        if (Object.keys(filters).length === 0) {
+            return apis;
+        }
+
+        return apis.filter((api) => {
+            return Object.entries(filters).every(([key, value]) => {
+                const apiValue = api[key] || '未分類';
+                return apiValue === value;
+            });
+        });
+    }, [apis, filters]);
 
     // Search handler
     const handleSearch = useCallback(async (keyword) => {
@@ -109,6 +130,32 @@ export default function App() {
         }
     }, []);
 
+    // URLからのAPIインポートハンドラー
+    const handleUrlImport = useCallback(async (apiData) => {
+        try {
+            const enrichedApi = {
+                ...apiData,
+                id: uuidv4(),
+                searchKeyword: 'URLインポート',
+                createdAt: Date.now(),
+                status: apiData.status || 'active'
+            };
+
+            await saveApi(enrichedApi);
+
+            // Reload all APIs
+            const allApis = await getAllApis();
+            setApis(allApis);
+        } catch (err) {
+            setError(err.message);
+        }
+    }, []);
+
+    // Toggle sidebar
+    const toggleSidebar = useCallback(() => {
+        setSidebarOpen((prev) => !prev);
+    }, []);
+
     // Render detail view
     if (selectedApi) {
         return (
@@ -128,38 +175,64 @@ export default function App() {
 
     // Render main view
     return (
-        <div className="min-h-screen">
-            <Header
-                onImportComplete={handleImportComplete}
-                onOpenSettings={() => setShowSettings(true)}
-            />
-
-            <SearchSection
-                onSearch={handleSearch}
-                isLoading={isSearching}
-            />
-
-            {/* Error Toast */}
-            {error && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-                    <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
-                        <p className="text-rose-300">{error}</p>
-                        <button
-                            onClick={() => setError(null)}
-                            className="text-rose-400 hover:text-rose-300 text-sm"
-                        >
-                            閉じる
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <ApiGrid
+        <div className="min-h-screen flex">
+            {/* Sidebar */}
+            <Sidebar
                 apis={apis}
-                onSelect={setSelectedApi}
-                onDelete={setDeleteTarget}
-                isLoading={isLoading || isSearching}
+                selectedFilters={filters}
+                onFilterChange={setFilters}
+                isOpen={sidebarOpen}
+                onToggle={toggleSidebar}
             />
+
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+                <Header
+                    onImportComplete={handleImportComplete}
+                    onOpenSettings={() => setShowSettings(true)}
+                    onOpenHistory={() => setShowHistory(true)}
+                />
+
+                <SearchSection
+                    onSearch={handleSearch}
+                    onOpenUrlImport={() => setShowUrlImport(true)}
+                    isLoading={isSearching}
+                />
+
+                {/* Filter indicator */}
+                {Object.keys(filters).length > 0 && (
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-indigo-300">
+                            <span>フィルター適用中:</span>
+                            <span className="px-2 py-0.5 rounded-full bg-indigo-500/20">
+                                {filteredApis.length} / {apis.length} 件表示
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error Toast */}
+                {error && (
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
+                            <p className="text-rose-300">{error}</p>
+                            <button
+                                onClick={() => setError(null)}
+                                className="text-rose-400 hover:text-rose-300 text-sm"
+                            >
+                                閉じる
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                <ApiGrid
+                    apis={filteredApis}
+                    onSelect={setSelectedApi}
+                    onDelete={setDeleteTarget}
+                    isLoading={isLoading || isSearching}
+                />
+            </div>
 
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog
@@ -175,6 +248,19 @@ export default function App() {
             <SettingsModal
                 isOpen={showSettings}
                 onClose={() => setShowSettings(false)}
+            />
+
+            {/* History Panel */}
+            <HistoryPanel
+                isOpen={showHistory}
+                onClose={() => setShowHistory(false)}
+            />
+
+            {/* URL Import Modal */}
+            <UrlImportModal
+                isOpen={showUrlImport}
+                onClose={() => setShowUrlImport(false)}
+                onImport={handleUrlImport}
             />
         </div>
     );

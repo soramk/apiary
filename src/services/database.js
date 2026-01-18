@@ -1,7 +1,8 @@
 // IndexedDB データベースサービス
 const DB_NAME = 'ApiaryDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // バージョン2: historyストア追加
 const STORE_NAME = 'apis';
+const HISTORY_STORE = 'searchHistory';
 
 let db = null;
 
@@ -29,12 +30,21 @@ export async function initDB() {
         request.onupgradeneeded = (event) => {
             const database = event.target.result;
 
+            // APIsストア
             if (!database.objectStoreNames.contains(STORE_NAME)) {
                 const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
                 store.createIndex('category', 'category', { unique: false });
                 store.createIndex('searchKeyword', 'searchKeyword', { unique: false });
                 store.createIndex('createdAt', 'createdAt', { unique: false });
                 store.createIndex('status', 'status', { unique: false });
+            }
+
+            // 履歴ストア (バージョン2で追加)
+            if (!database.objectStoreNames.contains(HISTORY_STORE)) {
+                const historyStore = database.createObjectStore(HISTORY_STORE, { keyPath: 'id' });
+                historyStore.createIndex('timestamp', 'timestamp', { unique: false });
+                historyStore.createIndex('keyword', 'keyword', { unique: false });
+                historyStore.createIndex('type', 'type', { unique: false });
             }
         };
     });

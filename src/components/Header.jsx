@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Database, Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText } from 'lucide-react';
+import { Database, Settings, Menu, X, Download, Upload, FileJson, FileSpreadsheet, FileText, History } from 'lucide-react';
 import { exportToJson, exportToCsv, exportToMarkdown, importFromJson } from '../services/database';
 
-export default function Header({ onImportComplete, onOpenSettings }) {
+export default function Header({ onImportComplete, onOpenSettings, onOpenHistory }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [importStatus, setImportStatus] = useState(null);
@@ -168,6 +168,20 @@ export default function Header({ onImportComplete, onOpenSettings }) {
                                         </label>
 
                                         <div className="my-2 border-t border-slate-600/50"></div>
+
+                                        <button
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                onOpenHistory?.();
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+                                        >
+                                            <History className="w-5 h-5 text-violet-400" />
+                                            <div>
+                                                <div className="text-sm text-slate-200">検索履歴</div>
+                                                <div className="text-xs text-slate-400">過去の検索を確認</div>
+                                            </div>
+                                        </button>
 
                                         <button
                                             onClick={() => {

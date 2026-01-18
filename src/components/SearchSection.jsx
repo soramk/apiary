@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Search, Sparkles, Loader2 } from 'lucide-react';
+import { Search, Sparkles, Loader2, Link2 } from 'lucide-react';
 
-export default function SearchSection({ onSearch, isLoading }) {
+export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) {
     const [keyword, setKeyword] = useState('');
 
     const handleSubmit = (e) => {
@@ -88,9 +88,27 @@ export default function SearchSection({ onSearch, isLoading }) {
                                 </button>
                             ))}
                         </div>
+
+                        {/* URL Import Button */}
+                        <div className="mt-6">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="h-px flex-1 bg-slate-700/50"></div>
+                                <span className="text-xs text-slate-500">または</span>
+                                <div className="h-px flex-1 bg-slate-700/50"></div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onOpenUrlImport}
+                                className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 hover:border-indigo-500/50 text-slate-300 hover:text-white transition-all"
+                            >
+                                <Link2 className="w-4 h-4" />
+                                <span>URLから直接登録</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </section>
     );
 }
+
