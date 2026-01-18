@@ -1,0 +1,339 @@
+import { useState } from 'react';
+import {
+    ArrowLeft,
+    ExternalLink,
+    Key,
+    DollarSign,
+    Building2,
+    RefreshCw,
+    Loader2,
+    CheckCircle,
+    AlertTriangle,
+    XCircle,
+    BookOpen,
+    Target,
+    Code2
+} from 'lucide-react';
+import { checkApiStatus } from '../services/gemini';
+import { saveApi } from '../services/database';
+import Playground from './Playground';
+import CodeGenerator from './CodeGenerator';
+
+export default function ApiDetail({ api, onBack, onUpdate }) {
+    const [activeTab, setActiveTab] = useState('overview');
+    const [isChecking, setIsChecking] = useState(false);
+    const [statusResult, setStatusResult] = useState(null);
+
+    const tabs = [
+        { id: 'overview', label: 'Overview', icon: BookOpen },
+        { id: 'playground', label: 'Playground', icon: Target },
+        { id: 'codegen', label: 'Code Gen', icon: Code2 }
+    ];
+
+    const getStatusConfig = (status) => {
+        switch (status) {
+            case 'deprecated':
+                return {
+                    label: 'Deprecated',
+                    className: 'bg-amber-500/20 text-amber-400 border-amber-500/50',
+                    icon: AlertTriangle
+                };
+            case 'eol':
+                return {
+                    label: 'End of Life',
+                    className: 'bg-rose-500/20 text-rose-400 border-rose-500/50',
+                    icon: XCircle
+                };
+            default:
+                return {
+                    label: 'Active',
+                    className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50',
+                    icon: CheckCircle
+                };
+        }
+    };
+
+    const statusConfig = getStatusConfig(api.status);
+    const StatusIcon = statusConfig.icon;
+
+    const handleCheckStatus = async () => {
+        setIsChecking(true);
+        setStatusResult(null);
+
+        try {
+            const result = await checkApiStatus(api);
+            setStatusResult(result);
+
+            // ステータスが変わった場合、データベースを更新
+            if (result.status !== api.status) {
+                const updatedApi = {
+                    ...api,
+                    status: result.status,
+                    lastCheckedAt: Date.now()
+                };
+                await saveApi(updatedApi);
+                onUpdate?.(updatedApi);
+            }
+        } catch (err) {
+            setStatusResult({ error: err.message });
+        } finally {
+            setIsChecking(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen animate-fade-in">
+            {/* Header */}
+            <div className="glass sticky top-0 z-40 border-b border-slate-700/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <button
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        <span>一覧に戻る</span>
+                    </button>
+
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h1 className="text-2xl font-bold text-white">{api.name}</h1>
+                                <span className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
+                                    {api.category}
+                                </span>
+                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium border ${statusConfig.className}`}>
+                                    <StatusIcon className="w-4 h-4" />
+                                    <span>{statusConfig.label}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                                <Building2 className="w-4 h-4" />
+                                <span>{api.provider}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={handleCheckStatus}
+                                disabled={isChecking}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 transition-colors disabled:opacity-50"
+                            >
+                                {isChecking ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <RefreshCw className="w-4 h-4" />
+                                )}
+                                <span>ステータスを確認</span>
+                            </button>
+                            <a
+                                href={api.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl text-white"
+                            >
+                                <span>公式サイト</span>
+                                <ExternalLink className="w-4 h-4" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Status Check Result */}
+            {statusResult && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                    {statusResult.error ? (
+                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
+                            <p className="text-rose-300 text-sm">{statusResult.error}</p>
+                        </div>
+                    ) : (
+                        <div className={`p-4 rounded-xl border ${statusResult.status === 'active'
+                                ? 'bg-emerald-500/10 border-emerald-500/30'
+                                : statusResult.status === 'deprecated'
+                                    ? 'bg-amber-500/10 border-amber-500/30'
+                                    : 'bg-rose-500/10 border-rose-500/30'
+                            }`}>
+                            <div className="flex items-center gap-2 mb-2">
+                                {statusResult.status === 'active' && (
+                                    <>
+                                        <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                        <span className="font-medium text-emerald-300">このAPIは現在アクティブです</span>
+                                    </>
+                                )}
+                                {statusResult.status === 'deprecated' && (
+                                    <>
+                                        <AlertTriangle className="w-5 h-5 text-amber-400" />
+                                        <span className="font-medium text-amber-300">このAPIは非推奨になっています</span>
+                                    </>
+                                )}
+                                {statusResult.status === 'eol' && (
+                                    <>
+                                        <XCircle className="w-5 h-5 text-rose-400" />
+                                        <span className="font-medium text-rose-300">このAPIはサービス終了しています</span>
+                                    </>
+                                )}
+                            </div>
+                            {statusResult.changes && (
+                                <p className="text-sm text-slate-300 ml-7">{statusResult.changes}</p>
+                            )}
+                            {statusResult.notes && (
+                                <p className="text-sm text-slate-400 ml-7 mt-1">{statusResult.notes}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left Content */}
+                    <div className="flex-1">
+                        {/* Tabs */}
+                        <div className="flex gap-1 p-1 mb-6 bg-slate-800/50 rounded-xl">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${activeTab === tab.id
+                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                            }`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        <span>{tab.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="glass-card rounded-2xl p-6">
+                            {activeTab === 'overview' && (
+                                <div className="space-y-6 animate-fade-in">
+                                    {/* Description */}
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white mb-3">概要</h3>
+                                        <p className="text-slate-300 leading-relaxed">
+                                            {api.longDescription || api.description}
+                                        </p>
+                                    </div>
+
+                                    {/* Use Cases */}
+                                    {api.useCases && api.useCases.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-white mb-3">主なユースケース</h3>
+                                            <ul className="space-y-2">
+                                                {api.useCases.map((useCase, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="flex items-start gap-3 text-slate-300"
+                                                    >
+                                                        <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-sm flex-shrink-0">
+                                                            {index + 1}
+                                                        </span>
+                                                        <span>{useCase}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Endpoint Example */}
+                                    {api.endpointExample && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-white mb-3">
+                                                エンドポイント例
+                                            </h3>
+                                            <div className="code-block p-4">
+                                                <code className="text-emerald-400">{api.endpointExample}</code>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Response Example */}
+                                    {api.responseExample && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-white mb-3">
+                                                レスポンス例
+                                            </h3>
+                                            <div className="code-block p-4 overflow-x-auto">
+                                                <pre className="text-sm text-slate-300">
+                                                    {JSON.stringify(api.responseExample, null, 2)}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {activeTab === 'playground' && (
+                                <div className="animate-fade-in">
+                                    <Playground api={api} />
+                                </div>
+                            )}
+
+                            {activeTab === 'codegen' && (
+                                <div className="animate-fade-in">
+                                    <CodeGenerator api={api} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="lg:w-80">
+                        <div className="glass-card rounded-2xl p-6 sticky top-32">
+                            <h3 className="text-lg font-semibold text-white mb-4">メタデータ</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                        <Key className="w-4 h-4" />
+                                        <span className="text-sm">認証方式</span>
+                                    </div>
+                                    <span className="text-white font-medium">{api.authType}</span>
+                                </div>
+
+                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                        <DollarSign className="w-4 h-4" />
+                                        <span className="text-sm">料金</span>
+                                    </div>
+                                    <span className="text-white font-medium">{api.pricing}</span>
+                                </div>
+
+                                <div className="flex items-center justify-between py-3 border-b border-slate-700/50">
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                        <Building2 className="w-4 h-4" />
+                                        <span className="text-sm">提供元</span>
+                                    </div>
+                                    <span className="text-white font-medium text-right">{api.provider}</span>
+                                </div>
+
+                                {api.searchKeyword && (
+                                    <div className="pt-3">
+                                        <p className="text-xs text-slate-500 mb-2">検索キーワード</p>
+                                        <span className="inline-block px-3 py-1 rounded-lg text-sm bg-slate-800/50 text-slate-300">
+                                            {api.searchKeyword}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {api.lastCheckedAt && (
+                                    <div className="pt-3">
+                                        <p className="text-xs text-slate-500 mb-2">最終確認日時</p>
+                                        <span className="text-sm text-slate-400">
+                                            {new Date(api.lastCheckedAt).toLocaleString('ja-JP')}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
