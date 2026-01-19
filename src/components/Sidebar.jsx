@@ -1,14 +1,11 @@
 import { useState, useMemo } from 'react';
 import {
-    ChevronDown,
-    ChevronRight,
     Layers,
     Building2,
     Search,
     Tag,
     X,
     FolderOpen,
-    Folder,
     Check,
     Filter,
     Heart,
@@ -40,7 +37,7 @@ const GROUP_LABELS = {
  */
 export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen, onToggle }) {
     const [groupBy, setGroupBy] = useState(GROUP_TYPES.CATEGORY);
-    const [expandedGroups, setExpandedGroups] = useState(new Set(['all']));
+    const [localSearchQuery, setLocalSearchQuery] = useState('');
 
     // グループ化されたAPIを計算
     const groupedApis = useMemo(() => {
@@ -83,22 +80,6 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
         if (Array.isArray(filterValue)) return filterValue;
         return [filterValue];
     }, [selectedFilters, groupBy]);
-
-    // グループの展開/折りたたみ
-    const toggleExpand = (groupName, e) => {
-        e.stopPropagation();
-        setExpandedGroups((prev) => {
-            const next = new Set(prev);
-            if (next.has(groupName)) {
-                next.delete(groupName);
-            } else {
-                next.add(groupName);
-            }
-            // 'all' を削除（個別に展開状態を管理）
-            next.delete('all');
-            return next;
-        });
-    };
 
     // フィルターの選択/解除（複数選択対応）
     const handleFilterToggle = (groupName) => {
@@ -143,6 +124,21 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
     // すべてのフィルターをクリア
     const clearAllFilters = () => {
         onFilterChange({});
+        setLocalSearchQuery('');
+    };
+
+    // ローカル検索フィルターを適用
+    const handleLocalSearch = (query) => {
+        setLocalSearchQuery(query);
+        const newFilters = { ...selectedFilters };
+
+        if (query.trim()) {
+            newFilters._localSearch = query.trim().toLowerCase();
+        } else {
+            delete newFilters._localSearch;
+        }
+
+        onFilterChange(newFilters);
     };
 
     // フィルターがアクティブかどうか
@@ -150,7 +146,8 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
 
     // アクティブなフィルターの総数
     const activeFilterCount = useMemo(() => {
-        return Object.values(selectedFilters).reduce((count, value) => {
+        return Object.entries(selectedFilters).reduce((count, [key, value]) => {
+            if (key === '_localSearch') return count; // ローカル検索はカウントしない
             if (Array.isArray(value)) return count + value.length;
             return count + 1;
         }, 0);
@@ -160,6 +157,7 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
     const flattenedFilters = useMemo(() => {
         const result = [];
         Object.entries(selectedFilters).forEach(([type, value]) => {
+            if (type === '_localSearch') return; // ローカル検索は別途表示
             const typeLabel = GROUP_LABELS[type]?.label || type;
             if (Array.isArray(value)) {
                 value.forEach((v) => result.push({ type, value: v, typeLabel }));
@@ -222,6 +220,28 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                         </button>
                     </div>
 
+                    {/* ローカル検索 */}
+                    <div className="mb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                                type="text"
+                                value={localSearchQuery}
+                                onChange={(e) => handleLocalSearch(e.target.value)}
+                                placeholder="登録済みAPIを検索..."
+                                className="w-full pl-9 pr-8 py-2 bg-slate-50 hover:bg-white focus:bg-white rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-300 transition-all border border-slate-200 focus:border-pink-300"
+                            />
+                            {localSearchQuery && (
+                                <button
+                                    onClick={() => handleLocalSearch('')}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Quick Filters */}
                     <div className="flex gap-2 mb-4">
                         <button
@@ -274,7 +294,7 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                     <div className="px-4 py-3 bg-pink-50 border-b border-pink-100">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-medium text-pink-700">
-                                フィルター適用中 ({activeFilterCount}件)
+                                フィルター適用中
                             </span>
                             <button
                                 onClick={clearAllFilters}
@@ -284,6 +304,15 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                                 すべてクリア
                             </button>
                         </div>
+                        {/* ローカル検索表示 */}
+                        {selectedFilters._localSearch && (
+                            <div className="mb-2">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-sky-100 border border-sky-200 text-sky-700 text-xs">
+                                    <Search className="w-3 h-3" />
+                                    "{selectedFilters._localSearch}"
+                                </span>
+                            </div>
+                        )}
                         <div className="flex flex-wrap gap-1.5">
                             {flattenedFilters.map(({ type, value, typeLabel }) => (
                                 <button
@@ -315,88 +344,50 @@ export default function Sidebar({ apis, selectedFilters, onFilterChange, isOpen,
                             </div>
 
                             {groupedApis.map(([groupName, groupApis]) => {
-                                const isExpanded = expandedGroups.has(groupName);
                                 const isSelected = currentFilters.includes(groupName);
 
                                 return (
-                                    <div key={groupName}>
-                                        {/* グループヘッダー（クリックでフィルター） */}
-                                        <button
-                                            onClick={() => handleFilterToggle(groupName)}
-                                            className={`
-                                                w-full flex items-center justify-between px-3 py-2.5 rounded-lg
-                                                transition-all duration-200 text-left
+                                    <button
+                                        key={groupName}
+                                        onClick={() => handleFilterToggle(groupName)}
+                                        className={`
+                                            w-full flex items-center justify-between px-3 py-2.5 rounded-lg
+                                            transition-all duration-200 text-left
+                                            ${isSelected
+                                                ? 'bg-pink-100 border border-pink-300'
+                                                : 'hover:bg-slate-50 border border-transparent'
+                                            }
+                                        `}
+                                    >
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                            {/* チェックボックス表示 */}
+                                            <div className={`
+                                                w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
+                                                transition-all duration-200
                                                 ${isSelected
-                                                    ? 'bg-pink-100 border border-pink-300'
-                                                    : 'hover:bg-slate-50 border border-transparent'
+                                                    ? 'bg-pink-500 border-pink-500'
+                                                    : 'border-slate-300 hover:border-slate-400'
                                                 }
-                                            `}
-                                        >
-                                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                {/* チェックボックス表示 */}
-                                                <div className={`
-                                                    w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
-                                                    transition-all duration-200
-                                                    ${isSelected
-                                                        ? 'bg-pink-500 border-pink-500'
-                                                        : 'border-slate-300 hover:border-slate-400'
-                                                    }
-                                                `}>
-                                                    {isSelected && <Check className="w-3 h-3 text-white" />}
-                                                </div>
-
-                                                <GroupIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                                                <span className={`text-sm font-medium truncate ${isSelected ? 'text-pink-700' : 'text-slate-700'}`}>
-                                                    {groupName}
-                                                </span>
+                                            `}>
+                                                {isSelected && <Check className="w-3 h-3 text-white" />}
                                             </div>
 
-                                            <div className="flex items-center gap-2 flex-shrink-0">
-                                                <span className={`
-                                                    px-2 py-0.5 rounded-full text-xs font-medium
-                                                    ${isSelected
-                                                        ? 'bg-pink-200 text-pink-700'
-                                                        : 'bg-slate-100 text-slate-500'
-                                                    }
-                                                `}>
-                                                    {groupApis.length}
-                                                </span>
+                                            <GroupIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                                            <span className={`text-sm font-medium truncate ${isSelected ? 'text-pink-700' : 'text-slate-700'}`}>
+                                                {groupName}
+                                            </span>
+                                        </div>
 
-                                                {/* 展開ボタン */}
-                                                <button
-                                                    onClick={(e) => toggleExpand(groupName, e)}
-                                                    className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
-                                                    title="詳細を表示"
-                                                >
-                                                    {isExpanded ? (
-                                                        <ChevronDown className="w-4 h-4" />
-                                                    ) : (
-                                                        <ChevronRight className="w-4 h-4" />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </button>
-
-                                        {/* グループ内のAPIリスト */}
-                                        {isExpanded && (
-                                            <div className="ml-8 mt-1 mb-2 space-y-0.5 animate-fade-in">
-                                                {groupApis.slice(0, 5).map((api) => (
-                                                    <div
-                                                        key={api.id}
-                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-500"
-                                                    >
-                                                        <Folder className="w-3.5 h-3.5 text-slate-400" />
-                                                        <span className="truncate">{api.name}</span>
-                                                    </div>
-                                                ))}
-                                                {groupApis.length > 5 && (
-                                                    <div className="px-3 py-1 text-xs text-slate-400 italic">
-                                                        他 {groupApis.length - 5} 件...
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
+                                        <span className={`
+                                            px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0
+                                            ${isSelected
+                                                ? 'bg-pink-200 text-pink-700'
+                                                : 'bg-slate-100 text-slate-500'
+                                            }
+                                        `}>
+                                            {groupApis.length}
+                                        </span>
+                                    </button>
                                 );
                             })}
                         </div>

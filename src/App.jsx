@@ -57,10 +57,29 @@ export default function App() {
             result = result.filter(api => api.isFavorite);
         }
 
+        // ローカル検索フィルター
+        if (filters._localSearch) {
+            const query = filters._localSearch.toLowerCase();
+            result = result.filter(api => {
+                const searchTargets = [
+                    api.name,
+                    api.description,
+                    api.longDescription,
+                    api.category,
+                    api.provider,
+                    api.searchKeyword,
+                    ...(api.tags || []),
+                    ...(api.useCases || [])
+                ].filter(Boolean).map(s => s.toLowerCase());
+
+                return searchTargets.some(target => target.includes(query));
+            });
+        }
+
         // その他のフィルター（カテゴリ、プロバイダーなど）
         result = result.filter((api) => {
             return Object.entries(filters).every(([key, value]) => {
-                if (key === 'onlyFavorites') return true;
+                if (key === 'onlyFavorites' || key === '_localSearch') return true;
 
                 // タグフィルターの特別処理
                 if (key === 'tags') {
