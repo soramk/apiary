@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
-import SearchSection from './components/SearchSection';
+import WelcomeBanner from './components/WelcomeBanner';
 import ApiGrid from './components/ApiGrid';
 import ApiDetail from './components/ApiDetail';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -65,9 +65,6 @@ export default function App() {
                 // タグフィルターの特別処理
                 if (key === 'tags') {
                     if (!value || value.length === 0) return true;
-                    // APIが持っているタグのいずれかが、フィルターで選択されたタグに含まれているか（OR条件）
-                    // または、選択されたすべてのタグをAPIが持っているか（AND条件）
-                    // ここでは使いやすさを考慮して、いずれかにマッチすればOK（OR条件）とします
                     return (api.tags || []).some(tag => value.includes(tag));
                 }
 
@@ -75,7 +72,6 @@ export default function App() {
 
                 // 値が配列の場合（複数選択）
                 if (Array.isArray(value)) {
-                    // いずれかの値にマッチすればOK（OR条件）
                     return value.includes(apiValue);
                 }
 
@@ -225,25 +221,29 @@ export default function App() {
             />
 
             {/* Main Content */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 flex flex-col">
+                {/* Header with integrated search */}
                 <Header
                     onImportComplete={handleImportComplete}
                     onOpenSettings={() => setShowSettings(true)}
                     onOpenHistory={() => setShowHistory(true)}
-                />
-
-                <SearchSection
                     onSearch={handleSearch}
                     onOpenUrlImport={() => setShowUrlImport(true)}
-                    isLoading={isSearching}
+                    isSearching={isSearching}
+                />
+
+                {/* Welcome Banner (only shown when no APIs) */}
+                <WelcomeBanner
+                    onQuickSearch={handleSearch}
+                    totalApis={apis.length}
                 />
 
                 {/* Filter indicator */}
                 {Object.keys(filters).length > 0 && (
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-                        <div className="flex items-center gap-2 text-sm text-indigo-300">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
                             <span>フィルター適用中:</span>
-                            <span className="px-2 py-0.5 rounded-full bg-indigo-500/20">
+                            <span className="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 font-medium">
                                 {filteredApis.length} / {apis.length} 件表示
                             </span>
                         </div>
@@ -252,12 +252,12 @@ export default function App() {
 
                 {/* Error Toast */}
                 {error && (
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
-                            <p className="text-rose-300">{error}</p>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between">
+                            <p className="text-rose-700">{error}</p>
                             <button
                                 onClick={() => setError(null)}
-                                className="text-rose-400 hover:text-rose-300 text-sm"
+                                className="text-rose-500 hover:text-rose-700 text-sm font-medium"
                             >
                                 閉じる
                             </button>
@@ -265,13 +265,16 @@ export default function App() {
                     </div>
                 )}
 
-                <ApiGrid
-                    apis={filteredApis}
-                    onSelect={setSelectedApi}
-                    onDelete={setDeleteTarget}
-                    onToggleFavorite={handleToggleFavorite}
-                    isLoading={isLoading || isSearching}
-                />
+                {/* API Grid - Main content area */}
+                <div className="flex-1">
+                    <ApiGrid
+                        apis={filteredApis}
+                        onSelect={setSelectedApi}
+                        onDelete={setDeleteTarget}
+                        onToggleFavorite={handleToggleFavorite}
+                        isLoading={isLoading || isSearching}
+                    />
+                </div>
             </div>
 
             {/* Delete Confirmation Dialog */}
