@@ -262,3 +262,12 @@ aside::-webkit-scrollbar-thumb:hover {
         transform: translateY(0);
     }
 }
+
+/* ロゴをページに同化させるソフトマスク効果 */
+.logo-blend {
+    mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.15));
+}

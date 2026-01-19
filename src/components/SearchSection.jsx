@@ -47,7 +47,7 @@ export default function SearchSection({ onSearch, onOpenUrlImport, isLoading }) 
                     <img
                         src={apiaryLogo}
                         alt="Apiary"
-                        className="mx-auto h-32 sm:h-40 lg:h-48 w-auto object-contain drop-shadow-lg"
+                        className="mx-auto h-32 sm:h-40 lg:h-48 w-auto object-contain logo-blend"
                     />
                 </div>
 
